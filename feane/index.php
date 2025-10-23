@@ -435,86 +435,183 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     <!-- =========================
-       DANH SÁCH SÁCH
-       ========================= -->
-    <section class="about_section layout_padding">
-        <div class="container">
-            <div class="heading_container heading_center mb-5">
-                <h2 class="fw-bold">📚 Danh Sách Thư Viện</h2>
-                <p class="text-muted">Khám phá các cuốn sách nổi bật trong thư viện của chúng tôi</p>
-            </div>
+      <!-- =========================
+   DANH SÁCH SÁCH YÊU THÍCH
+========================= -->
+<section class="about_section layout_padding" style="background-color: #1e1f26;">
+  <div class="container">
+    <div class="heading_container heading_center mb-5">
+      <h2 class="fw-bold text-light">
+        📚 Danh Sách Thư Viện
+      </h2>
+      <p class="text-secondary">Khám phá các cuốn sách nổi bật trong thư viện của chúng tôi</p>
+    </div>
 
-            <div class="row g-4">
-                <?php
-            $sql_all = "SELECT sach.*, loaisach.tenloaisach, tacgia.tentacgia
-                        FROM sach
-                        LEFT JOIN loaisach ON sach.idloaisach = loaisach.maloaisach
-                        LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia
-                        ORDER BY sach.tensach ASC";
-            $res = mysqli_query($ketnoi, $sql_all);
-            if ($res && mysqli_num_rows($res) > 0) {
-                while ($r = mysqli_fetch_assoc($res)) {
-                    $img = 'images/' . $r['hinhanhsach'];
-                    $masach = (int)$r['masach'];
-            ?>
-                <div class="col-sm-6 col-md-4 col-lg-3">
-                    <div class="card book-card shadow-sm border-0 rounded-4 overflow-hidden h-100 position-relative">
-                        <div class="overflow-hidden">
-                            <img src="<?php echo htmlspecialchars($img); ?>" class="card-img-top img-hover-scale"
-                                style="height:260px; object-fit:cover;">
-                        </div>
-                        <div class="card-body text-center d-flex flex-column">
-                            <h5 class="fw-bold text-truncate" title="<?php echo htmlspecialchars($r['tensach']); ?>">
-                                <?php echo htmlspecialchars($r['tensach']); ?>
-                            </h5>
-                            <p class="text-muted mb-1 small"><?php echo htmlspecialchars($r['tentacgia']); ?> •
-                                <?php echo htmlspecialchars($r['tenloaisach']); ?></p>
-                            <span class="badge bg-danger mb-3 fw-semibold">Giá:
-                                <?php echo number_format($r['dongia']); ?> VNĐ</span>
-                            <div class="mt-auto d-flex justify-content-center gap-2">
-                                <a href="chitietsach.php?masach=<?php echo $masach; ?>"
-                                    class="btn btn-sm btn-primary">Chi tiết</a>
-                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                    data-target="#muonModal<?php echo $masach; ?>">Mượn</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php
-                }
-            } else {
-                echo '<p class="text-center text-muted">Hiện chưa có sách trong thư viện.</p>';
-            }
-            ?>
+    <div class="row g-4 justify-content-center">
+      <?php
+      // Lấy 8 sách đầu tiên
+      $sql_all = "SELECT sach.*, loaisach.tenloaisach, tacgia.tentacgia
+                  FROM sach
+                  LEFT JOIN loaisach ON sach.idloaisach = loaisach.maloaisach
+                  LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia
+                  ORDER BY sach.tensach ASC
+                  LIMIT 8";
+      $res = mysqli_query($ketnoi, $sql_all);
+
+      if ($res && mysqli_num_rows($res) > 0) {
+        while ($r = mysqli_fetch_assoc($res)) {
+          $img = 'images/' . $r['hinhanhsach'];
+          $masach = (int)$r['masach'];
+      ?>
+      <div class="col-sm-6 col-md-4 col-lg-3">
+        <div class="card book-card shadow-sm border-0 rounded-4 overflow-hidden h-100 position-relative">
+          
+          <!-- Nút yêu thích -->
+          <button class="favorite-btn" data-id="<?php echo $masach; ?>">
+            <i class="fa fa-heart"></i>
+          </button>
+
+          <div class="overflow-hidden">
+            <img src="<?php echo htmlspecialchars($img); ?>" 
+                 class="card-img-top img-hover-scale"
+                 style="height:260px; object-fit:cover;">
+          </div>
+
+          <div class="card-body text-center d-flex flex-column bg-dark text-light">
+            <h5 class="fw-bold text-truncate" 
+                title="<?php echo htmlspecialchars($r['tensach']); ?>">
+              <?php echo htmlspecialchars($r['tensach']); ?>
+            </h5>
+            <p class="text-secondary small mb-3">
+              <?php echo htmlspecialchars($r['tentacgia']); ?> • 
+              <?php echo htmlspecialchars($r['tenloaisach']); ?>
+            </p>
+            <div class="mt-auto d-flex justify-content-center gap-2">
+              <a href="chitietsach.php?masach=<?php echo $masach; ?>" 
+                 class="btn btn-sm btn-primary rounded-pill px-3">
+                 Chi tiết
+              </a>
+              <a href="book.php?masach=<?php echo $masach; ?>" 
+                 class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3">
+                 Mượn
+              </a>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+      <?php
+        }
+      } else {
+        echo '<p class="text-center text-muted">Hiện chưa có sách trong thư viện.</p>';
+      }
+      ?>
+    </div>
 
-    <!-- CSS nâng cấp -->
-    <style>
+    <!-- Nút Xem Thêm -->
+    <div class="text-center mt-5">
+      <a href="menu.php" class="btn btn-warning px-5 py-2 fw-bold rounded-pill shadow-sm">
+        Xem thêm
+      </a>
+    </div>
+  </div>
+
+  <!-- CSS -->
+  <style>
     .book-card {
-        transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.3s, box-shadow 0.3s;
+      background-color: #222;
+      position: relative;
     }
 
     .book-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Icon trái tim yêu thích */
+    .favorite-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      z-index: 10;
+    }
+
+    .favorite-btn i {
+      color: #bbb;
+      font-size: 18px;
+      transition: color 0.3s ease, transform 0.2s;
+    }
+
+    .favorite-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .favorite-btn.active i {
+      color: #ff4d4d;
+      transform: scale(1.2);
     }
 
     .img-hover-scale {
-        transition: transform 0.3s;
+      transition: transform 0.3s;
     }
 
     .img-hover-scale:hover {
-        transform: scale(1.05);
+      transform: scale(1.05);
     }
 
-    .text-truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+    .heading_container h2 {
+      color: #ffc107;
+      font-weight: 700;
+      margin-bottom: 10px;
     }
-    </style>
+
+    .heading_container p {
+      color: #ccc;
+      font-size: 16px;
+    }
+
+    .btn-warning {
+      background-color: #ffc107 !important;
+      color: #000 !important;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-warning:hover {
+      background-color: #ffcd38 !important;
+      transform: translateY(-2px);
+    }
+
+    .card-body {
+      background-color: #111;
+      border-top: 2px solid #ffc107;
+    }
+
+    .card-body h5 {
+      color: #fff;
+    }
+  </style>
+
+  <!-- Script -->
+  <script>
+    document.querySelectorAll(".favorite-btn").forEach(btn => {
+      btn.addEventListener("click", function() {
+        this.classList.toggle("active");
+      });
+    });
+  </script>
+</section>
+
 
 
 
