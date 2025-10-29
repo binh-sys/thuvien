@@ -2,96 +2,83 @@
 require_once('ketnoi.php');
 session_start();
 
-// Messages hiển thị cho người dùng
+// ===== THÔNG TIN NGƯỜI DÙNG ĐĂNG NHẬP =====
+$logged_name = $_SESSION['hoten'] ?? '';
+$logged_email = $_SESSION['email'] ?? '';
+
+// ===== THÔNG TIN SÁCH =====
+$selected_books = [];
+if (isset($_GET['masach'])) {
+    $ids = [(int)$_GET['masach']];
+} elseif (isset($_GET['ids'])) {
+    $ids = array_map('intval', explode(',', $_GET['ids']));
+} else {
+    $ids = [];
+}
+
+if (!empty($ids)) {
+    $id_str = implode(',', $ids);
+    $q = mysqli_query($ketnoi, "
+        SELECT sach.masach, sach.tensach, tacgia.tentacgia, loaisach.tenloaisach 
+        FROM sach 
+        LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia 
+        LEFT JOIN loaisach ON sach.idloaisach = loaisach.maloaisach 
+        WHERE sach.masach IN ($id_str)
+    ");
+    while ($r = mysqli_fetch_assoc($q)) {
+        $selected_books[] = $r;
+    }
+}
+
+// ====== XỬ LÝ GỬI FORM ======
 $message_form = "";
-
-// ========== Các hàm xử lý ==========
-function get_or_create_user($ketnoi, $hoten, $email) {
-    $stmt = mysqli_prepare($ketnoi, "SELECT manguoidung, hoten FROM nguoidung WHERE email = ?");
-    mysqli_stmt_bind_param($stmt, 's', $email);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_bind_result($stmt, $uid, $db_hoten);
-    if (mysqli_stmt_fetch($stmt)) {
-        mysqli_stmt_close($stmt);
-        if ($db_hoten !== $hoten && $hoten !== '') {
-            $u = mysqli_prepare($ketnoi, "UPDATE nguoidung SET hoten = ? WHERE manguoidung = ?");
-            mysqli_stmt_bind_param($u, 'si', $hoten, $uid);
-            mysqli_stmt_execute($u);
-            mysqli_stmt_close($u);
-        }
-        return (int)$uid;
-    }
-    mysqli_stmt_close($stmt);
-
-    $default_pass = password_hash('12345', PASSWORD_DEFAULT);
-    $vaitro = 'hoc_sinh';
-    $ins = mysqli_prepare($ketnoi, "INSERT INTO nguoidung (hoten, email, matkhau, vaitro) VALUES (?, ?, ?, ?)");
-    mysqli_stmt_bind_param($ins, 'ssss', $hoten, $email, $default_pass, $vaitro);
-    if (mysqli_stmt_execute($ins)) {
-        $newid = mysqli_insert_id($ketnoi);
-        mysqli_stmt_close($ins);
-        return (int)$newid;
-    }
-    mysqli_stmt_close($ins);
-    return false;
-}
-
-function is_already_borrowed($ketnoi, $manguoidung, $masach) {
-    $q = mysqli_prepare($ketnoi, "SELECT COUNT(*) FROM muonsach WHERE manguoidung = ? AND masach = ? AND trangthai != 'da_tra'");
-    mysqli_stmt_bind_param($q, 'ii', $manguoidung, $masach);
-    mysqli_stmt_execute($q);
-    mysqli_stmt_bind_result($q, $cnt);
-    mysqli_stmt_fetch($q);
-    mysqli_stmt_close($q);
-    return ($cnt > 0);
-}
-
-function borrow_book_insert($ketnoi, $manguoidung, $masach, $ngaymuon, $hantra) {
-    $trangthai = 'dang_muon';
-    $ins = mysqli_prepare($ketnoi, "INSERT INTO muonsach (manguoidung, masach, ngaymuon, hantra, trangthai) VALUES (?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($ins, 'iisss', $manguoidung, $masach, $ngaymuon, $hantra, $trangthai);
-    $ok = mysqli_stmt_execute($ins);
-    mysqli_stmt_close($ins);
-    return $ok;
-}
-
-// ========== Xử lý POST ==========
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $hoten = trim($_POST['hoten'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $masach = intval($_POST['masach'] ?? 0);
-    $ngaymuon = $_POST['ngaymuon'] ?? date('Y-m-d');
+    $hoten = trim($_POST['hoten']);
+    $email = trim($_POST['email']);
+    $book_ids = $_POST['book_ids'] ?? [];
     $hantra = $_POST['hantra'] ?? date('Y-m-d', strtotime('+7 days'));
+    $ngaymuon = date('Y-m-d');
 
-    if ($hoten === '' || $email === '' || $masach <= 0) {
-        $message_form = '<div class="alert alert-danger">⚠️ Vui lòng nhập đầy đủ thông tin.</div>';
+    if (empty($hoten) || empty($email) || empty($book_ids)) {
+        $message_form = '<div class="alert alert-danger">⚠️ Vui lòng nhập đầy đủ thông tin và chọn ít nhất 1 sách.</div>';
     } else {
-        $s = mysqli_prepare($ketnoi, "SELECT Soluong, tensach FROM sach WHERE masach = ?");
-        mysqli_stmt_bind_param($s, 'i', $masach);
-        mysqli_stmt_execute($s);
-        mysqli_stmt_bind_result($s, $soluong, $tensach);
-        if (!mysqli_stmt_fetch($s)) {
-            $message_form = '<div class="alert alert-danger">⚠️ Sách không tồn tại.</div>';
+        $stmt_user = mysqli_prepare($ketnoi, "SELECT manguoidung FROM nguoidung WHERE email=?");
+        mysqli_stmt_bind_param($stmt_user, 's', $email);
+        mysqli_stmt_execute($stmt_user);
+        mysqli_stmt_bind_result($stmt_user, $uid);
+        if (mysqli_stmt_fetch($stmt_user)) {
+            $manguoidung = $uid;
         } else {
-            mysqli_stmt_close($s);
-            if ((int)$soluong <= 0) {
-                $message_form = '<div class="alert alert-warning">⚠️ Sách "<strong>'.htmlspecialchars($tensach).'</strong>" đã hết.</div>';
-            } else {
-                $manguoidung = get_or_create_user($ketnoi, $hoten, $email);
-                if ($manguoidung === false) {
-                    $message_form = '<div class="alert alert-danger">❌ Lỗi khi xử lý người dùng.</div>';
-                } elseif (is_already_borrowed($ketnoi, $manguoidung, $masach)) {
-                    $message_form = '<div class="alert alert-warning">⚠️ Bạn đang mượn cuốn này và chưa trả.</div>';
-                } elseif (borrow_book_insert($ketnoi, $manguoidung, $masach, $ngaymuon, $hantra)) {
-                    $u = mysqli_prepare($ketnoi, "UPDATE sach SET Soluong = Soluong - 1 WHERE masach = ?");
-                    mysqli_stmt_bind_param($u, 'i', $masach);
-                    mysqli_stmt_execute($u);
-                    mysqli_stmt_close($u);
-                    $message_form = '<div class="alert alert-success">✅ Mượn sách thành công! (' . htmlspecialchars($tensach) . ')</div>';
-                } else {
-                    $message_form = '<div class="alert alert-danger">❌ Lỗi khi lưu yêu cầu.</div>';
+            $manguoidung = null;
+        }
+        mysqli_stmt_close($stmt_user);
+
+        if ($manguoidung) {
+            $inserted = 0;
+            foreach ($book_ids as $masach) {
+                $check = mysqli_prepare($ketnoi, "SELECT COUNT(*) FROM muonsach WHERE manguoidung=? AND masach=? AND trangthai!='da_tra'");
+                mysqli_stmt_bind_param($check, 'ii', $manguoidung, $masach);
+                mysqli_stmt_execute($check);
+                mysqli_stmt_bind_result($check, $cnt);
+                mysqli_stmt_fetch($check);
+                mysqli_stmt_close($check);
+
+                if ($cnt == 0) {
+                    $ins = mysqli_prepare($ketnoi, "INSERT INTO muonsach (manguoidung, masach, ngaymuon, hantra, trangthai) VALUES (?, ?, ?, ?, 'dang_muon')");
+                    mysqli_stmt_bind_param($ins, 'iiss', $manguoidung, $masach, $ngaymuon, $hantra);
+                    if (mysqli_stmt_execute($ins)) $inserted++;
+                    mysqli_stmt_close($ins);
+
+                    mysqli_query($ketnoi, "UPDATE sach SET Soluong = Soluong - 1 WHERE masach = $masach AND Soluong > 0");
                 }
             }
+            if ($inserted > 0) {
+                $message_form = '<div class="alert alert-success">✅ Mượn thành công ' . $inserted . ' sách!</div>';
+            } else {
+                $message_form = '<div class="alert alert-warning">⚠️ Tất cả sách bạn chọn đã được mượn hoặc không khả dụng.</div>';
+            }
+        } else {
+            $message_form = '<div class="alert alert-danger">❌ Không tìm thấy tài khoản người dùng.</div>';
         }
     }
 }
@@ -133,213 +120,320 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <!-- Header -->
-<?php
-  $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
-?>
-<header class="header_section">
-  <div class="container">
-    <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-      
-      <!-- Logo -->
-      <a class="navbar-brand d-flex align-items-center" href="index.php">
-        <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-        <span style="font-weight: bold; font-size: 20px; color: #fff;">
-          THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-        </span>
-      </a>
+        <?php
+        $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
+        ?>
+        <header class="header_section">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
 
-      <!-- Nút mở menu khi mobile -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
-        style="border: none; outline: none;">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+                    <!-- Logo -->
+                    <a class="navbar-brand d-flex align-items-center" href="index.php">
+                        <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
+                        <span style="font-weight: bold; font-size: 20px; color: #fff;">
+                            THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
+                        </span>
+                    </a>
 
-      <!-- Menu chính -->
-      <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-        <ul class="navbar-nav text-uppercase fw-bold">
-          <li class="nav-item <?php if($current_page=='index.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='menu.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='about.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='book.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-          </li>
-        </ul>
-      </div>
+                    <!-- Nút mở menu khi mobile -->
+                    <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-      <!-- Góc phải: user -->
-      <div class="user_option d-flex align-items-center" style="white-space: nowrap; gap: 12px;">
-        <?php if(isset($_SESSION['hoten'])): ?>
-          <span class="text-white d-flex align-items-center mb-0" style="font-size: 15px;">
-            <i class="fa fa-user-circle text-warning mr-2" style="font-size:18px;"></i>
-            Xin chào, <b class="ml-1"><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
-          </span>
-          <a href="dangxuat.php" class="btn fw-bold"
-            style="background-color:#ffc107; color:#000; border-radius:25px; padding:6px 20px;">
-            Đăng xuất
-          </a>
-        <?php else: ?>
-          <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-            style="border-radius:25px; padding:6px 20px;">
-            <i class="fa fa-user mr-2"></i> Đăng nhập
-          </a>
-        <?php endif; ?>
-      </div>
+                    <!-- Menu chính -->
+                    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                        <ul class="navbar-nav text-uppercase fw-bold">
+                            <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
+                            </li>
+                        </ul>
+                    </div>
 
-    </nav>
-  </div>
+                    <!-- Góc phải: user -->
+                    <div class="user_option d-flex align-items-center" style="gap: 12px;">
+                        <?php if (isset($_SESSION['hoten'])): ?>
+                            <div class="user-dropdown">
+                                <div class="user-dropdown-trigger">
+                                    <i class="fa fa-user-circle text-warning" style="font-size:18px;"></i>
+                                    Xin chào, <b><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
+                                </div>
 
-  <!-- CSS -->
-  <style>
-    /* ===== Header cố định khi cuộn ===== */
-    .header_section {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(0, 0, 0, 0.95);
-      z-index: 1000;
-      padding: 15px 0;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    /* Khi cuộn xuống */
-    .header_section.scrolled {
-      background-color: rgba(0, 0, 0, 1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      padding: 10px 0;
-    }
-
-    /* ===== Menu ===== */
-    .header_section .nav-link {
-      transition: color 0.3s ease;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
-
-    .header_section .nav-link:hover {
-      color: #ffc107 !important;
-    }
-
-    /* ===== Active ===== */
-    .header_section .nav-item.active .nav-link {
-      color: #ffc107 !important;
-      font-weight: 700;
-      position: relative;
-    }
-
-    .header_section .nav-item.active .nav-link::after {
-      content: "";
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 35%;
-      height: 2px;
-      background-color: #ffc107;
-      border-radius: 1px;
-    }
-
-    /* Ngăn xuống dòng và căn chỉnh user góc phải */
-    .user_option {
-      flex-shrink: 0;
-    }
-
-    body {
-      padding-top: 90px; /* tránh nội dung bị che bởi header */
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-      .user_option {
-        margin-top: 10px;
-        justify-content: center;
-      }
-      body {
-        padding-top: 120px;
-      }
-    }
-  </style>
-
-  <!-- Script hiệu ứng khi cuộn -->
-  <script>
-    window.addEventListener("scroll", function() {
-      const header = document.querySelector(".header_section");
-      if (window.scrollY > 10) {
-        header.classList.add("scrolled");
-      } else {
-        header.classList.remove("scrolled");
-      }
-    });
-  </script>
-</header>
+                                <div class="user-dropdown-menu">
+                                    <a href="yeuthich.php" class="dropdown-item">
+                                        Yêu thích
+                                    </a>
+                                    <a href="lichsu.php" class="dropdown-item">
+                                        Lịch sử mượn sách
+                                    </a>
+                                    <hr>
+                                    <a href="dangxuat.php" class="dropdown-item text-danger">
+                                        Đăng xuất
+                                    </a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
+                                style="border-radius:25px; padding:6px 20px;">
+                                <i class="fa fa-user mr-2"></i> Đăng nhập
+                            </a>
+                        <?php endif; ?>
+                    </div>
 
 
+                </nav>
+            </div>
 
-  <!-- Form mượn sách -->
-  <section class="book_section">
-    <div class="container">
-      <div class="heading_container mb-4">
-        <h2>Đăng ký mượn sách</h2>
-        <p>Nhập thông tin để đăng ký mượn — tài khoản sẽ được tạo tự động nếu chưa có.</p>
-      </div>
+            <!-- CSS -->
+            <style>
+                /* ===== Header cố định khi cuộn ===== */
 
-      <div class="row">
-        <div class="col-md-6">
-          <div class="card p-4 shadow-sm">
-            <form method="POST" action="book.php" class="form_container">
-              <div class="form-group mb-3">
-                <label>Họ và tên</label>
-                <input type="text" name="hoten" class="form-control" placeholder="Họ và tên" required>
-              </div>
-              <div class="form-group mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" placeholder="Email" required>
-              </div>
-              <div class="form-group mb-3">
-                <label>Chọn sách</label>
-                <select name="masach" class="form-control" required>
-                  <option value="">-- Chọn sách --</option>
-                  <?php
-                    $book_q = mysqli_query($ketnoi, "SELECT masach, tensach, Soluong FROM sach ORDER BY tensach ASC");
-                    while ($b = mysqli_fetch_assoc($book_q)) {
-                      echo '<option value="'.$b['masach'].'">'.htmlspecialchars($b['tensach']).' (Còn: '.$b['Soluong'].')</option>';
+                /* Hiển thị menu khi hover */
+                .user-dropdown {
+                    position: relative;
+                    display: inline-block;
+                }
+
+                .user-dropdown-trigger {
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: #fff;
+                    font-size: 15px;
+                    transition: color 0.3s ease;
+                }
+
+                .user-dropdown-trigger:hover {
+                    color: #ffc107;
+                }
+
+                /* --- MENU --- */
+                .user-dropdown-menu {
+                    position: absolute;
+                    top: 115%;
+                    right: 0;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                    min-width: 180px;
+                    padding: 6px;
+                    opacity: 0;
+                    transform: translateY(-10px);
+                    transition: all 0.25s ease;
+                    visibility: hidden;
+                    z-index: 999;
+                }
+
+                .user-dropdown:hover .user-dropdown-menu {
+                    opacity: 1;
+                    transform: translateY(0);
+                    visibility: visible;
+                }
+
+                /* --- ITEM --- */
+                .user-dropdown-menu .dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 12px;
+                    font-size: 15px;
+                    color: #222;
+                    border-radius: 8px;
+                    /* 🔥 Bo góc từng dòng */
+                    margin: 2px 0;
+                    /* 🔥 Có khoảng cách với viền */
+                    transition: background-color 0.2s ease, color 0.2s ease;
+                }
+
+                .user-dropdown-menu .dropdown-item:hover {
+                    background-color: #fff6d0;
+                    /* vàng nhạt nhẹ nhàng */
+                    color: #000;
+                }
+
+                .user-dropdown-menu hr {
+                    margin: 6px 0;
+                    border-top: 1px solid #eee;
+                }
+
+
+
+                .header_section {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    background-color: rgba(0, 0, 0, 0.95);
+                    z-index: 1000;
+                    padding: 15px 0;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                }
+
+                /* Khi cuộn xuống */
+                .header_section.scrolled {
+                    background-color: rgba(0, 0, 0, 1);
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+                    padding: 10px 0;
+                }
+
+                /* ===== Menu ===== */
+                .header_section .nav-link {
+                    transition: color 0.3s ease;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                }
+
+                .header_section .nav-link:hover {
+                    color: #ffc107 !important;
+                }
+
+                /* ===== Active ===== */
+                .header_section .nav-item.active .nav-link {
+                    color: #ffc107 !important;
+                    font-weight: 700;
+                    position: relative;
+                }
+
+                .header_section .nav-item.active .nav-link::after {
+                    content: "";
+                    position: absolute;
+                    bottom: -6px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 35%;
+                    height: 2px;
+                    background-color: #ffc107;
+                    border-radius: 1px;
+                }
+
+                /* Ngăn xuống dòng và căn chỉnh user góc phải */
+                .user_option {
+                    flex-shrink: 0;
+                }
+
+                body {
+                    padding-top: 90px;
+                    /* tránh nội dung bị che bởi header */
+                }
+
+                /* Responsive */
+                @media (max-width: 992px) {
+                    .user_option {
+                        margin-top: 10px;
+                        justify-content: center;
                     }
-                  ?>
-                </select>
-              </div>
 
-              <div class="form-row mb-3">
-                <div class="col">
-                  <label>Ngày mượn</label>
-                  <input type="date" name="ngaymuon" class="form-control" value="<?php echo date('Y-m-d'); ?>" required>
-                </div>
-                <div class="col">
-                  <label>Hạn trả</label>
-                  <input type="date" name="hantra" class="form-control" value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>" required>
-                </div>
-              </div>
+                    body {
+                        padding-top: 120px;
+                    }
+                }
+            </style>
 
-              <button type="submit" class="btn btn-warning px-4">Gửi yêu cầu mượn</button>
-            </form>
+            <!-- Script hiệu ứng khi cuộn -->
+            <script>
+                window.addEventListener("scroll", function() {
+                    const header = document.querySelector(".header_section");
+                    if (window.scrollY > 10) {
+                        header.classList.add("scrolled");
+                    } else {
+                        header.classList.remove("scrolled");
+                    }
+                });
+            </script>
+        </header>
+        <!-- end header section -->
 
-            <div class="mt-3"><?php echo $message_form; ?></div>
+
+<!-- ===== FORM MƯỢN SÁCH ===== -->
+<section class="book_section py-5">
+  <div class="container">
+    <div class="card p-4 shadow-lg border-0" style="border-radius: 15px;">
+      <h3 class="mb-4 text-center text-warning">
+        <i class="fa fa-book me-2"></i> Xác nhận mượn sách
+      </h3>
+
+      <form method="POST">
+        <!-- Họ tên -->
+        <div class="form-group mb-3">
+          <label>Họ và tên</label>
+          <input type="text" name="hoten" class="form-control bg-dark text-white border-secondary"
+                 value="<?php echo htmlspecialchars($logged_name); ?>"
+                 placeholder="Nhập họ và tên..." required>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group mb-3">
+          <label>Email</label>
+          <input type="email" name="email" class="form-control bg-dark text-white border-secondary"
+                 value="<?php echo htmlspecialchars($logged_email); ?>"
+                 placeholder="Nhập email của bạn..." required>
+        </div>
+
+        <!-- Ngày mượn -->
+        <div class="form-group mb-3">
+          <label>Ngày mượn</label>
+          <input type="date" name="ngaymuon" class="form-control bg-dark text-white border-secondary"
+                 value="<?php echo date('Y-m-d'); ?>" readonly>
+        </div>
+
+        <!-- Hạn trả -->
+        <div class="form-group mb-4">
+          <label>Hạn trả</label>
+          <input type="date" name="hantra" class="form-control bg-dark text-white border-secondary"
+                 min="<?php echo date('Y-m-d'); ?>"
+                 max="<?php echo date('Y-m-d', strtotime('+14 days')); ?>"
+                 value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>" required>
+          <small class="text-muted">⚠️ Ngày trả phải trong vòng 14 ngày kể từ hôm nay.</small>
+        </div>
+
+        <!-- Danh sách sách đã chọn -->
+        <?php if (!empty($selected_books)): ?>
+          <div class="form-group mb-3">
+            <label>📚 Danh sách sách bạn sẽ mượn:</label>
+            <ul class="book-list list-unstyled bg-dark text-white p-3 rounded">
+              <?php foreach ($selected_books as $b): ?>
+                <li class="py-1 border-bottom border-secondary">
+                  <i class="fa fa-book me-2 text-warning"></i>
+                  <b><?php echo htmlspecialchars($b['tensach']); ?></b> 
+                  — <small><?php echo htmlspecialchars($b['tentacgia']); ?> (<?php echo htmlspecialchars($b['tenloaisach']); ?>)</small>
+                  <input type="hidden" name="book_ids[]" value="<?php echo $b['masach']; ?>">
+                </li>
+              <?php endforeach; ?>
+            </ul>
           </div>
-        </div>
+        <?php else: ?>
+          <div class="alert alert-warning text-center">⚠️ Bạn chưa chọn sách nào để mượn!</div>
+        <?php endif; ?>
 
-        <div class="col-md-6 d-flex align-items-center justify-content-center">
-          <img src="images/nv1.png" alt="Nhân viên thư viện" style="max-width:100%; max-height:420px; object-fit:contain;">
+        <!-- Nút xác nhận -->
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-warning px-5 py-2 fw-bold rounded-pill">
+            ✅ Xác nhận mượn
+          </button>
         </div>
+      </form>
+
+      <!-- Hiển thị thông báo -->
+      <div class="mt-4">
+        <?php echo $message_form; ?>
       </div>
     </div>
-  </section>
+  </div>
+</section>
+
+
 
   <!-- Footer -->
   <footer class="footer_section mt-auto">

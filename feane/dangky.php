@@ -31,12 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $vaitro = 'hoc_sinh';
       $ins = mysqli_prepare($ketnoi, "INSERT INTO nguoidung (hoten, email, matkhau, vaitro) VALUES (?, ?, ?, ?)");
       mysqli_stmt_bind_param($ins, 'ssss', $hoten, $email, $hash, $vaitro);
-      if (mysqli_stmt_execute($ins)) {
-        $message = '<div class="alert alert-success text-center">✅ Đăng ký thành công! Hãy đăng nhập ngay.</div>';
-      } else {
-        $message = '<div class="alert alert-danger text-center">Có lỗi xảy ra, vui lòng thử lại.</div>';
-      }
-      mysqli_stmt_close($ins);
+     if (mysqli_stmt_execute($ins)) {
+  $message = '<div class="alert alert-success text-center">
+                ✅ Đăng ký thành công! Đang chuyển hướng đến trang đăng nhập...
+              </div>';
+  echo '<meta http-equiv="refresh" content="2;url=dangnhap.php">';
+  // hoặc dùng JavaScript nếu bạn muốn hiệu ứng mượt hơn:
+  // echo "<script>setTimeout(() => { window.location.href='dangnhap.php'; }, 2000);</script>";
+} else {
+  $message = '<div class="alert alert-danger text-center">Có lỗi xảy ra, vui lòng thử lại.</div>';
+}
     }
     mysqli_stmt_close($stmt);
   }

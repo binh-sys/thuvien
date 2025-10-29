@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Lưu session
         $_SESSION['manguoidung'] = $manguoidung;
         $_SESSION['hoten'] = $hoten;
+        $_SESSION['email'] = $email;
         $_SESSION['vaitro'] = $vaitro;
 
         // Chuyển hướng về trang chủ

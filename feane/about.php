@@ -113,151 +113,244 @@ session_start();
 <?php
   $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
 ?>
-    <!-- Header -->
-<header class="header_section">
-  <div class="container">
-    <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-      
-      <!-- Logo -->
-      <a class="navbar-brand d-flex align-items-center" href="index.php">
-        <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-        <span style="font-weight: bold; font-size: 20px; color: #fff;">
-          THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-        </span>
-      </a>
+<!-- Header -->
+        <?php
+        $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
+        ?>
+        <header class="header_section">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
 
-      <!-- Nút mở menu khi mobile -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
-        style="border: none; outline: none;">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+                    <!-- Logo -->
+                    <a class="navbar-brand d-flex align-items-center" href="index.php">
+                        <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
+                        <span style="font-weight: bold; font-size: 20px; color: #fff;">
+                            THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
+                        </span>
+                    </a>
 
-      <!-- Menu chính -->
-      <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-        <ul class="navbar-nav text-uppercase fw-bold">
-          <li class="nav-item <?php if($current_page=='index.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='menu.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='about.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-          </li>
-          <li class="nav-item <?php if($current_page=='book.php') echo 'active'; ?>">
-            <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-          </li>
-        </ul>
-      </div>
+                    <!-- Nút mở menu khi mobile -->
+                    <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-      <!-- Góc phải: user -->
-      <div class="user_option d-flex align-items-center" style="white-space: nowrap; gap: 12px;">
-        <?php if(isset($_SESSION['hoten'])): ?>
-          <span class="text-white d-flex align-items-center mb-0" style="font-size: 15px;">
-            <i class="fa fa-user-circle text-warning mr-2" style="font-size:18px;"></i>
-            Xin chào, <b class="ml-1"><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
-          </span>
-          <a href="dangxuat.php" class="btn fw-bold"
-            style="background-color:#ffc107; color:#000; border-radius:25px; padding:6px 20px;">
-            Đăng xuất
-          </a>
-        <?php else: ?>
-          <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-            style="border-radius:25px; padding:6px 20px;">
-            <i class="fa fa-user mr-2"></i> Đăng nhập
-          </a>
-        <?php endif; ?>
-      </div>
+                    <!-- Menu chính -->
+                    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+                        <ul class="navbar-nav text-uppercase fw-bold">
+                            <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
+                            </li>
+                            <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
+                                <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
+                            </li>
+                        </ul>
+                    </div>
 
-    </nav>
-  </div>
+                    <!-- Góc phải: user -->
+                    <div class="user_option d-flex align-items-center" style="gap: 12px;">
+                        <?php if (isset($_SESSION['hoten'])): ?>
+                            <div class="user-dropdown">
+                                <div class="user-dropdown-trigger">
+                                    <i class="fa fa-user-circle text-warning" style="font-size:18px;"></i>
+                                    Xin chào, <b><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
+                                </div>
 
-  <!-- CSS -->
-  <style>
-    /* ===== Header cố định khi cuộn ===== */
-    .header_section {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: rgba(0, 0, 0, 0.95);
-      z-index: 1000;
-      padding: 15px 0;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
+                                <div class="user-dropdown-menu">
+                                    <a href="yeuthich.php" class="dropdown-item">
+                                        Yêu thích
+                                    </a>
+                                    <a href="lichsu.php" class="dropdown-item">
+                                        Lịch sử mượn sách
+                                    </a>
+                                    <hr>
+                                    <a href="dangxuat.php" class="dropdown-item text-danger">
+                                        Đăng xuất
+                                    </a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
+                                style="border-radius:25px; padding:6px 20px;">
+                                <i class="fa fa-user mr-2"></i> Đăng nhập
+                            </a>
+                        <?php endif; ?>
+                    </div>
 
-    /* Khi cuộn xuống */
-    .header_section.scrolled {
-      background-color: rgba(0, 0, 0, 1);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-      padding: 10px 0;
-    }
 
-    /* ===== Menu ===== */
-    .header_section .nav-link {
-      transition: color 0.3s ease;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
+                </nav>
+            </div>
 
-    .header_section .nav-link:hover {
-      color: #ffc107 !important;
-    }
+            <!-- CSS -->
+            <style>
+                /* ===== Header cố định khi cuộn ===== */
 
-    /* ===== Active ===== */
-    .header_section .nav-item.active .nav-link {
-      color: #ffc107 !important;
-      font-weight: 700;
-      position: relative;
-    }
+                /* Hiển thị menu khi hover */
+                .user-dropdown {
+                    position: relative;
+                    display: inline-block;
+                }
 
-    .header_section .nav-item.active .nav-link::after {
-      content: "";
-      position: absolute;
-      bottom: -6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 35%;
-      height: 2px;
-      background-color: #ffc107;
-      border-radius: 1px;
-    }
+                .user-dropdown-trigger {
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: #fff;
+                    font-size: 15px;
+                    transition: color 0.3s ease;
+                }
 
-    /* Ngăn xuống dòng và căn chỉnh user góc phải */
-    .user_option {
-      flex-shrink: 0;
-    }
+                .user-dropdown-trigger:hover {
+                    color: #ffc107;
+                }
 
-    body {
-      padding-top: 90px; /* tránh nội dung bị che bởi header */
-    }
+                /* --- MENU --- */
+                .user-dropdown-menu {
+                    position: absolute;
+                    top: 115%;
+                    right: 0;
+                    background: #fff;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                    min-width: 180px;
+                    padding: 6px;
+                    opacity: 0;
+                    transform: translateY(-10px);
+                    transition: all 0.25s ease;
+                    visibility: hidden;
+                    z-index: 999;
+                }
 
-    /* Responsive */
-    @media (max-width: 992px) {
-      .user_option {
-        margin-top: 10px;
-        justify-content: center;
-      }
-      body {
-        padding-top: 120px;
-      }
-    }
-  </style>
+                .user-dropdown:hover .user-dropdown-menu {
+                    opacity: 1;
+                    transform: translateY(0);
+                    visibility: visible;
+                }
 
-  <!-- Script hiệu ứng khi cuộn -->
-  <script>
-    window.addEventListener("scroll", function() {
-      const header = document.querySelector(".header_section");
-      if (window.scrollY > 10) {
-        header.classList.add("scrolled");
-      } else {
-        header.classList.remove("scrolled");
-      }
-    });
-  </script>
-</header>
+                /* --- ITEM --- */
+                .user-dropdown-menu .dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 8px 12px;
+                    font-size: 15px;
+                    color: #222;
+                    border-radius: 8px;
+                    /* 🔥 Bo góc từng dòng */
+                    margin: 2px 0;
+                    /* 🔥 Có khoảng cách với viền */
+                    transition: background-color 0.2s ease, color 0.2s ease;
+                }
+
+                .user-dropdown-menu .dropdown-item:hover {
+                    background-color: #fff6d0;
+                    /* vàng nhạt nhẹ nhàng */
+                    color: #000;
+                }
+
+                .user-dropdown-menu hr {
+                    margin: 6px 0;
+                    border-top: 1px solid #eee;
+                }
+
+
+
+                .header_section {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    background-color: rgba(0, 0, 0, 0.95);
+                    z-index: 1000;
+                    padding: 15px 0;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                }
+
+                /* Khi cuộn xuống */
+                .header_section.scrolled {
+                    background-color: rgba(0, 0, 0, 1);
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+                    padding: 10px 0;
+                }
+
+                /* ===== Menu ===== */
+                .header_section .nav-link {
+                    transition: color 0.3s ease;
+                    font-weight: 600;
+                    letter-spacing: 0.5px;
+                }
+
+                .header_section .nav-link:hover {
+                    color: #ffc107 !important;
+                }
+
+                /* ===== Active ===== */
+                .header_section .nav-item.active .nav-link {
+                    color: #ffc107 !important;
+                    font-weight: 700;
+                    position: relative;
+                }
+
+                .header_section .nav-item.active .nav-link::after {
+                    content: "";
+                    position: absolute;
+                    bottom: -6px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 35%;
+                    height: 2px;
+                    background-color: #ffc107;
+                    border-radius: 1px;
+                }
+
+                /* Ngăn xuống dòng và căn chỉnh user góc phải */
+                .user_option {
+                    flex-shrink: 0;
+                }
+
+                body {
+                    padding-top: 90px;
+                    /* tránh nội dung bị che bởi header */
+                }
+
+                /* Responsive */
+                @media (max-width: 992px) {
+                    .user_option {
+                        margin-top: 10px;
+                        justify-content: center;
+                    }
+
+                    body {
+                        padding-top: 120px;
+                    }
+                }
+            </style>
+
+            <!-- Script hiệu ứng khi cuộn -->
+            <script>
+                window.addEventListener("scroll", function() {
+                    const header = document.querySelector(".header_section");
+                    if (window.scrollY > 10) {
+                        header.classList.add("scrolled");
+                    } else {
+                        header.classList.remove("scrolled");
+                    }
+                });
+            </script>
+        </header>
+
+
+
+        <!-- end header section -->
 
 
 
