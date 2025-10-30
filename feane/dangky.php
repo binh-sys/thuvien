@@ -62,74 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/responsive.css" rel="stylesheet" />
-  <style>
-    body {
-      background: linear-gradient(135deg, #000, #1a1a1a);
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
-      min-height: 100vh;
-    }
-
-    .register-container {
-      max-width: 500px;
-      margin: 80px auto;
-      background: #111;
-      padding: 40px 35px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
-    }
-
-    .register-container h3 {
-      text-align: center;
-      color: #ffc107;
-      margin-bottom: 25px;
-      font-weight: bold;
-    }
-
-    .form-control {
-      background-color: #222;
-      border: 1px solid #444;
-      color: #fff;
-    }
-
-    .form-control:focus {
-      border-color: #ffc107;
-      box-shadow: 0 0 5px #ffc107;
-    }
-
-    .btn-register {
-      background-color: #ffc107;
-      color: #000;
-      font-weight: 600;
-      border-radius: 30px;
-      width: 100%;
-      padding: 10px;
-      transition: 0.3s;
-    }
-
-    .btn-register:hover {
-      background-color: #e0a800;
-    }
-
-    .register-footer {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .register-footer a {
-      color: #ffc107;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .register-footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="css/dangky.css">
+  <link href="css/footer.css" rel="stylesheet">
 </head>
 
 <body>
-
   <div class="register-container">
     <h3>Tạo Tài Khoản Thư Viện</h3>
     <?php echo $message; ?>

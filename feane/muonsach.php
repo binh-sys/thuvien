@@ -68,32 +68,8 @@ if (isset($_GET['masach'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    body {
-      background: linear-gradient(135deg, #eef2f3, #8e9eab);
-      font-family: 'Poppins', sans-serif;
-    }
-    .card {
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      background: #fff;
-    }
-    .book-image {
-      border-radius: 12px;
-      transition: transform .3s;
-    }
-    .book-image:hover {
-      transform: scale(1.05);
-    }
-    .btn-primary {
-      background: linear-gradient(to right, #007bff, #00c6ff);
-      border: none;
-    }
-    .btn-primary:hover {
-      background: linear-gradient(to right, #0062cc, #0097e6);
-    }
-  </style>
+  <link href="css/footer.css" rel="stylesheet">
+  <link href="css/muonsach.css" rel="stylesheet">
 </head>
 <body>
 
