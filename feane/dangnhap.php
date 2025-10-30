@@ -123,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="login-footer mt-3">
-      <p>Chưa có tài khoản? <a href="dangky.php">Liên hệ thư viện để đăng ký</a></p>
+      <p>Chưa có tài khoản? <a href="dangky.php">Đăng ký</a></p>
       <p><a href="index.php"><i class="fa fa-arrow-left"></i> Quay lại trang chủ</a></p>
     </div>
   </div>

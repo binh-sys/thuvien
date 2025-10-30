@@ -109,24 +109,28 @@ $books = mysqli_query($ketnoi, $sql);
           </span>
         </a>
         <!-- Nút mở menu khi mobile -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-          data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-          aria-label="Toggle navigation" style="border: none; outline: none;">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+          style="border: none; outline: none;">
           <span class="navbar-toggler-icon"></span>
         </button>
         <!-- Menu chính -->
         <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
           <ul class="navbar-nav text-uppercase fw-bold">
-            <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
+            <li class="nav-item <?php if ($current_page == 'index.php')
+              echo 'active'; ?>">
               <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
             </li>
-            <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
+            <li class="nav-item <?php if ($current_page == 'menu.php')
+              echo 'active'; ?>">
               <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
             </li>
-            <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
+            <li class="nav-item <?php if ($current_page == 'about.php')
+              echo 'active'; ?>">
               <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
             </li>
-            <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
+            <li class="nav-item <?php if ($current_page == 'book.php')
+              echo 'active'; ?>">
               <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
             </li>
           </ul>
@@ -153,8 +157,7 @@ $books = mysqli_query($ketnoi, $sql);
               </div>
             </div>
           <?php else: ?>
-            <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-              style="border-radius:25px; padding:6px 20px;">
+            <a href="dangnhap.php" class="btn btn-outline-warning fw-bold" style="border-radius:25px; padding:6px 20px;">
               <i class="fa fa-user mr-2"></i> Đăng nhập
             </a>
           <?php endif; ?>
@@ -306,7 +309,7 @@ $books = mysqli_query($ketnoi, $sql);
     </style>
     <!-- Script hiệu ứng khi cuộn -->
     <script>
-      window.addEventListener("scroll", function() {
+      window.addEventListener("scroll", function () {
         const header = document.querySelector(".header_section");
         if (window.scrollY > 10) {
           header.classList.add("scrolled");
@@ -391,7 +394,7 @@ $books = mysqli_query($ketnoi, $sql);
       <?php mysqli_data_seek($loaisach, 0); ?>
       <?php while ($row = mysqli_fetch_assoc($loaisach)) {
         $active = ($idloaisach == $row['maloaisach']) ? 'active' : '';
-      ?>
+        ?>
         <li class="<?= $active; ?>">
           <a href="menu.php?idloaisach=<?= $row['maloaisach']; ?>" class="filter-link">
             <?= htmlspecialchars($row['tenloaisach']); ?>
@@ -406,8 +409,7 @@ $books = mysqli_query($ketnoi, $sql);
     <div class="container">
       <!-- NÚT MƯỢN NHIỀU -->
       <div class="text-center mb-4">
-        <button id="borrow-selected" class="btn btn-warning fw-bold px-4 py-2 rounded-pill"
-          style="display:none;">
+        <button id="borrow-selected" class="btn btn-warning fw-bold px-4 py-2 rounded-pill" style="display:none;">
           <i class="fa fa-book me-2"></i> Mượn sách đã chọn
         </button>
       </div>
@@ -416,15 +418,21 @@ $books = mysqli_query($ketnoi, $sql);
       <div class="row">
         <?php while ($r = mysqli_fetch_assoc($books)) {
           $img = 'images/' . $r['hinhanhsach'];
-        ?>
+          ?>
           <div class="col-sm-6 col-lg-4 mb-4">
             <div class="box">
               <!-- Checkbox chọn nhiều -->
               <input type="checkbox" class="select-book" value="<?= $r['masach']; ?>"
                 style="position:absolute; top:10px; left:10px; transform:scale(1.3); cursor:pointer;">
 
-              <div class="img-box">
+              <div class="img-box position-relative">
                 <img src="<?= htmlspecialchars($img); ?>" alt="<?= htmlspecialchars($r['tensach']); ?>">
+
+                <!-- ❤️ Nút yêu thích -->
+                <button class="favorite-btn <?= in_array($r['masach'], $_SESSION['favorites'] ?? []) ? 'liked' : ''; ?>"
+                  data-id="<?= $r['masach']; ?>" style="position:absolute; top:10px; right:10px;">
+                  <i class="fa fa-heart"></i>
+                </button>
               </div>
 
               <div class="detail-box">
@@ -433,12 +441,10 @@ $books = mysqli_query($ketnoi, $sql);
                 <h6 class="text-secondary small mb-3"><?= htmlspecialchars($r['tenloaisach']); ?></h6>
 
                 <div class="options d-flex justify-content-center gap-3">
-                  <a href="chitietsach.php?masach=<?= $r['masach']; ?>"
-                    class="btn btn-outline-primary rounded-pill px-4">
+                  <a href="chitietsach.php?masach=<?= $r['masach']; ?>" class="btn btn-outline-primary rounded-pill px-4">
                     <i class="fa fa-info-circle me-1"></i> Chi tiết
                   </a>
-                  <a href="book.php?masach=<?= $r['masach']; ?>"
-                    class="btn btn-warning rounded-pill px-4">
+                  <a href="book.php?masach=<?= $r['masach']; ?>" class="btn btn-warning rounded-pill px-4">
                     <i class="fa fa-book me-1"></i> Mượn
                   </a>
                 </div>
@@ -454,10 +460,10 @@ $books = mysqli_query($ketnoi, $sql);
   <!-- SCRIPT -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       // Hiệu ứng chọn nhiều sách
       const selectedBooks = new Set();
-      $(document).on("change", ".select-book", function() {
+      $(document).on("change", ".select-book", function () {
         const id = $(this).val();
         if (this.checked) selectedBooks.add(id);
         else selectedBooks.delete(id);
@@ -465,7 +471,7 @@ $books = mysqli_query($ketnoi, $sql);
       });
 
       // Chuyển sang trang mượn nhiều
-      $("#borrow-selected").on("click", function() {
+      $("#borrow-selected").on("click", function () {
         if (selectedBooks.size === 0) return;
         const ids = Array.from(selectedBooks).join(",");
         window.location.href = "book.php?ids=" + encodeURIComponent(ids);
@@ -530,8 +536,6 @@ $books = mysqli_query($ketnoi, $sql);
       transition: all 0.25s ease-in-out;
     }
 
-
-    /* Hộp sách */
     /* Hộp sách */
     .box {
       background: rgba(255, 255, 255, 0.05);
@@ -817,7 +821,7 @@ $books = mysqli_query($ketnoi, $sql);
       }, 3000);
     }
 
-    $(document).on("click", ".favorite-btn", function() {
+    $(document).on("click", ".favorite-btn", function () {
       const btn = $(this);
       const masach = btn.data("id");
 
@@ -828,7 +832,7 @@ $books = mysqli_query($ketnoi, $sql);
           masach: masach
         },
         dataType: "json",
-        success: function(res) {
+        success: function (res) {
           if (res.status === "added") {
             btn.addClass("liked");
             showToast("✅ Đã thêm vào danh sách yêu thích");
@@ -839,7 +843,7 @@ $books = mysqli_query($ketnoi, $sql);
             showToast(res.message);
           }
         },
-        error: function() {
+        error: function () {
           showToast("⚠️ Lỗi kết nối máy chủ");
         },
       });

@@ -12,7 +12,7 @@ $manguoidung = $_SESSION['manguoidung'];
 // Lấy bộ lọc
 $keyword = isset($_GET['keyword']) ? trim($_GET['keyword']) : '';
 $trangthai = isset($_GET['trangthai']) ? trim($_GET['trangthai']) : '';
-
+    
 // Truy vấn lịch sử mượn
 $sql = "SELECT muonsach.*, sach.tensach, sach.hinhanhsach 
         FROM muonsach
