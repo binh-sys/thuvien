@@ -49,61 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
   <link href="css/style.css" rel="stylesheet" />
   <link href="css/responsive.css" rel="stylesheet" />
-  <style>
-    body {
-      background: linear-gradient(135deg, #000, #1a1a1a);
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
-      min-height: 100vh;
-    }
-    .login-container {
-      max-width: 450px;
-      margin: 100px auto;
-      background: #111;
-      padding: 40px 35px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
-    }
-    .login-container h3 {
-      text-align: center;
-      color: #ffc107;
-      margin-bottom: 25px;
-      font-weight: bold;
-    }
-    .form-control {
-      background-color: #222;
-      border: 1px solid #444;
-      color: #fff;
-    }
-    .form-control:focus {
-      border-color: #ffc107;
-      box-shadow: 0 0 5px #ffc107;
-    }
-    .btn-login {
-      background-color: #ffc107;
-      color: #000;
-      font-weight: 600;
-      border-radius: 30px;
-      width: 100%;
-      padding: 10px;
-      transition: 0.3s;
-    }
-    .btn-login:hover {
-      background-color: #e0a800;
-    }
-    .login-footer {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .login-footer a {
-      color: #ffc107;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .login-footer a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="css/dangnhap.css">
+  <link href="css/footer.css" rel="stylesheet">
 </head>
 <body>
 
@@ -123,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="login-footer mt-3">
-      <p>Chưa có tài khoản? <a href="dangky.php">Liên hệ thư viện để đăng ký</a></p>
+      <p>Chưa có tài khoản? <a href="dangky.php">Đăng ký</a></p>
       <p><a href="index.php"><i class="fa fa-arrow-left"></i> Quay lại trang chủ</a></p>
     </div>
   </div>

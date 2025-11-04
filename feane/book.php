@@ -22,7 +22,7 @@ if (!empty($ids)) {
         SELECT sach.masach, sach.tensach, tacgia.tentacgia, loaisach.tenloaisach 
         FROM sach 
         LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia 
-        LEFT JOIN loaisach ON sach.idloaisach = loaisach.maloaisach 
+        LEFT JOIN loaisach ON sach.idloaisach = loaisach.idloaisach 
         WHERE sach.masach IN ($id_str)
     ");
     while ($r = mysqli_fetch_assoc($q)) {
@@ -96,25 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link rel="stylesheet" href="css/font-awesome.min.css">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/responsive.css">
-
-  <style>
-    header.header_section {
-      background: #000;
-      padding: 15px 0;
-    }
-    header.header_section .nav-link,
-    header.header_section .navbar-brand span {
-      color: #fff !important;
-    }
-    .book_section {
-      padding: 60px 0;
-      background: #fff;
-    }
-    .form_container .btn-warning {
-      background:#ffbe33; border:0;
-    }
-    .card { border-radius: 12px; }
-  </style>
+  <link rel="stylesheet" href="css/book.css">
+  <link rel="stylesheet" href="css/footer.css">
 </head>
 
 <body>
@@ -193,154 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 </nav>
             </div>
-
-            <!-- CSS -->
-            <style>
-                /* ===== Header cố định khi cuộn ===== */
-
-                /* Hiển thị menu khi hover */
-                .user-dropdown {
-                    position: relative;
-                    display: inline-block;
-                }
-
-                .user-dropdown-trigger {
-                    cursor: pointer;
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    color: #fff;
-                    font-size: 15px;
-                    transition: color 0.3s ease;
-                }
-
-                .user-dropdown-trigger:hover {
-                    color: #ffc107;
-                }
-
-                /* --- MENU --- */
-                .user-dropdown-menu {
-                    position: absolute;
-                    top: 115%;
-                    right: 0;
-                    background: #fff;
-                    border-radius: 12px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-                    min-width: 180px;
-                    padding: 6px;
-                    opacity: 0;
-                    transform: translateY(-10px);
-                    transition: all 0.25s ease;
-                    visibility: hidden;
-                    z-index: 999;
-                }
-
-                .user-dropdown:hover .user-dropdown-menu {
-                    opacity: 1;
-                    transform: translateY(0);
-                    visibility: visible;
-                }
-
-                /* --- ITEM --- */
-                .user-dropdown-menu .dropdown-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    padding: 8px 12px;
-                    font-size: 15px;
-                    color: #222;
-                    border-radius: 8px;
-                    /* 🔥 Bo góc từng dòng */
-                    margin: 2px 0;
-                    /* 🔥 Có khoảng cách với viền */
-                    transition: background-color 0.2s ease, color 0.2s ease;
-                }
-
-                .user-dropdown-menu .dropdown-item:hover {
-                    background-color: #fff6d0;
-                    /* vàng nhạt nhẹ nhàng */
-                    color: #000;
-                }
-
-                .user-dropdown-menu hr {
-                    margin: 6px 0;
-                    border-top: 1px solid #eee;
-                }
-
-
-
-                .header_section {
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    background-color: rgba(0, 0, 0, 0.95);
-                    z-index: 1000;
-                    padding: 15px 0;
-                    transition: all 0.3s ease;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                }
-
-                /* Khi cuộn xuống */
-                .header_section.scrolled {
-                    background-color: rgba(0, 0, 0, 1);
-                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-                    padding: 10px 0;
-                }
-
-                /* ===== Menu ===== */
-                .header_section .nav-link {
-                    transition: color 0.3s ease;
-                    font-weight: 600;
-                    letter-spacing: 0.5px;
-                }
-
-                .header_section .nav-link:hover {
-                    color: #ffc107 !important;
-                }
-
-                /* ===== Active ===== */
-                .header_section .nav-item.active .nav-link {
-                    color: #ffc107 !important;
-                    font-weight: 700;
-                    position: relative;
-                }
-
-                .header_section .nav-item.active .nav-link::after {
-                    content: "";
-                    position: absolute;
-                    bottom: -6px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 35%;
-                    height: 2px;
-                    background-color: #ffc107;
-                    border-radius: 1px;
-                }
-
-                /* Ngăn xuống dòng và căn chỉnh user góc phải */
-                .user_option {
-                    flex-shrink: 0;
-                }
-
-                body {
-                    padding-top: 90px;
-                    /* tránh nội dung bị che bởi header */
-                }
-
-                /* Responsive */
-                @media (max-width: 992px) {
-                    .user_option {
-                        margin-top: 10px;
-                        justify-content: center;
-                    }
-
-                    body {
-                        padding-top: 120px;
-                    }
-                }
-            </style>
-
             <!-- Script hiệu ứng khi cuộn -->
             <script>
                 window.addEventListener("scroll", function() {
@@ -472,93 +307,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       &copy; <?php echo date("Y"); ?> <b>Thư Viện Trường Học</b> | Thiết kế bởi <span class="text-warning">CTECH</span>
     </p>
   </div>
-
-  <style>
-    /* ===== FOOTER SECTION ===== */
-    .footer_section {
-      background-color: #000;
-      color: #ddd;
-      padding: 50px 0 30px 0;
-      width: 100%;
-      position: relative;
-      bottom: 0;
-      left: 0;
-      flex-shrink: 0;
-      font-family: "Poppins", sans-serif;
-    }
-
-    /* Tiêu đề cột */
-    .footer_title {
-      color: #ffc107;
-      font-weight: 700;
-      font-size: 18px;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Danh sách và đoạn text */
-    .footer_list li,
-    .footer_text {
-      font-size: 15px;
-      line-height: 1.7;
-      color: #ccc;
-      margin-bottom: 6px;
-      transition: color 0.3s ease;
-    }
-
-    .footer_list li:hover {
-      color: #ffc107;
-      cursor: pointer;
-    }
-
-    .footer_text {
-      max-width: 320px;
-      margin: 0 auto;
-    }
-
-    /* Dòng ngăn cách */
-    .footer_line {
-      border-color: rgba(255, 255, 255, 0.1);
-      margin-top: 30px;
-    }
-
-    /* Bản quyền */
-    .footer_copy {
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 0;
-    }
-
-    /* Luôn dính cuối trang nếu nội dung ngắn */
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    main {
-      flex: 1;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .footer_text {
-        max-width: 100%;
-      }
-      .footer_section {
-        text-align: center;
-      }
-      .footer_title {
-        margin-top: 20px;
-      }
-    }
-  </style>
 </footer>
 
 

@@ -1,0 +1,427 @@
+/* HEADERRRRRRRRRRRRRRRRRRRRRRRRRR */
+header.header_section {
+  background: #000;
+  padding: 15px 0;
+}
+
+header.header_section .navbar-brand span {
+  color: #fff;
+}
+
+.navbar-nav .nav-link {
+  color: #fff !important;
+}
+
+.navbar-nav .nav-item.active .nav-link {
+  color: #ffbe33 !important;
+  font-weight: 600;
+}
+
+.user_option i {
+  color: #fff;
+}
+
+.filter-bar {
+  background: #ff1414ff;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  padding: 15px 20px;
+  margin-top: 30px;
+  margin-bottom: 25px;
+}
+
+.book-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.book-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.book-card img {
+  height: 260px;
+  object-fit: cover;
+}
+
+/* BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY*/
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 15px;
+  transition: color 0.3s ease;
+}
+
+.user-dropdown-trigger:hover {
+  color: #ffc107;
+}
+
+/* --- MENU --- */
+.user-dropdown-menu {
+  position: absolute;
+  top: 115%;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  padding: 6px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+  visibility: hidden;
+  z-index: 999;
+}
+.select-book {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  transform: scale(1.5);
+  z-index: 10;
+  cursor: pointer;
+  accent-color: #ffc107; /* màu vàng đồng bộ với giao diện */
+}
+.user-dropdown:hover .user-dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* --- ITEM --- */
+.user-dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #222;
+  border-radius: 8px;
+  /* 🔥 Bo góc từng dòng */
+  margin: 2px 0;
+  /* 🔥 Có khoảng cách với viền */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+  background-color: #fff6d0;
+  /* vàng nhạt nhẹ nhàng */
+  color: #000;
+}
+
+.user-dropdown-menu hr {
+  margin: 6px 0;
+  border-top: 1px solid #eee;
+}
+
+.header_section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  padding: 15px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Khi cuộn xuống */
+.header_section.scrolled {
+  background-color: rgba(0, 0, 0, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 10px 0;
+}
+
+/* ===== Menu ===== */
+.header_section .nav-link {
+  transition: color 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.header_section .nav-link:hover {
+  color: #ffc107 !important;
+}
+
+/* ===== Active ===== */
+.header_section .nav-item.active .nav-link {
+  color: #ffc107 !important;
+  font-weight: 700;
+  position: relative;
+}
+
+.header_section .nav-item.active .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 2px;
+  background-color: #ffc107;
+  border-radius: 1px;
+}
+
+/* Ngăn xuống dòng và căn chỉnh user góc phải */
+.user_option {
+  flex-shrink: 0;
+}
+
+body {
+  padding-top: 90px;
+  /* tránh nội dung bị che bởi header */
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .user_option {
+    margin-top: 10px;
+    justify-content: center;
+  }
+
+  body {
+    padding-top: 120px;
+  }
+}
+
+/* MENU SÁCHHHHHHHHHHHHHHH */
+.filters_menu {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 40px auto;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nút mặc định */
+.filters_menu li a {
+  display: inline-block;
+  background: linear-gradient(135deg, #ffa726, #ffca28);
+  color: #222;
+  padding: 12px 36px;
+  border-radius: 50px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid #fff176;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 8px rgba(255, 160, 0, 0.4);
+}
+
+/* Hover */
+.filters_menu li a:hover {
+  background: linear-gradient(135deg, #ffb300, #ffd740);
+  color: #000;
+  border-color: #ffeb3b;
+  box-shadow: 0 6px 14px rgba(255, 193, 7, 0.6);
+  transform: translateY(-3px);
+}
+
+/* Active */
+.filters_menu li.active a {
+  background: linear-gradient(135deg, #ffb300, #ff9800);
+  color: #000;
+  border: 2px solid #ffeb3b;
+  font-weight: 600;
+  box-shadow: 0 6px 16px rgba(255, 193, 7, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Khi click xuống */
+.filters_menu li a:active {
+  transform: scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(255, 252, 252, 1);
+}
+
+/* Hiệu ứng mượt mà */
+.filters_menu li a,
+.filters_menu li.active a {
+  transition: all 0.25s ease-in-out;
+}
+
+/* Hộp sách */
+.box {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Ảnh phủ full phần trên */
+.img-box {
+  position: relative;
+  height: 320px;
+  /* tăng nhẹ để ảnh hiển thị nhiều hơn */
+  overflow: hidden;
+}
+
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 🔹 Phần chi tiết — làm mờ xuyên ảnh */
+.detail-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px 10px 60px;
+  /* để chừa chỗ cho nút */
+  text-align: center;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0 0 15px 15px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+}
+
+/* Hover nhẹ sáng hơn */
+.box:hover .detail-box {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Nút hành động */
+.detail-box .options a {
+  padding: 10px 45px;
+  min-width: 160px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.detail-box .options a.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(13, 110, 253, 0.6);
+  transform: translateY(-3px);
+}
+
+.detail-box .options a.btn-warning:hover {
+  background-color: #ffcd38;
+  box-shadow: 0 0 15px rgba(255, 200, 50, 0.7);
+  transform: translateY(-3px);
+}
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+.toast {
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-size: 15px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast i {
+  color: #ffc107;
+  font-size: 18px;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #aaa;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+  color: #ff4444;
+}
+
+.favorite-btn.liked i {
+  color: #ff4444;
+}
+/* Nút yêu thích*/
+#toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 2000;
+}
+
+.toast {
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-size: 15px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.4s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.toast i {
+  color: #ffc107;
+  font-size: 18px;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #aaa;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.2);
+  color: #ff4444;
+}
+
+.favorite-btn.liked i {
+  color: #ff4444;
+}

@@ -1,0 +1,222 @@
+/* Header màu đen */
+.header_section {
+  background-color: #000 !important;
+  padding: 15px 0;
+}
+
+.navbar-brand span {
+  color: #fff;
+}
+
+.navbar-nav .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .active > .nav-link {
+  color: #ffbe33 !important;
+}
+
+.user_option i {
+  color: #fff;
+}
+
+/* Giới thiệu */
+.about-section {
+  background: #fff;
+  padding: 60px 0;
+}
+
+.team-card img {
+  height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.3s;
+}
+
+.team-card:hover img {
+  transform: scale(1.05);
+}
+
+.stats-box {
+  text-align: center;
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 30px;
+  transition: transform 0.3s;
+}
+
+.stats-box:hover {
+  transform: translateY(-5px);
+}
+
+.cta-section {
+  background: linear-gradient(90deg, #ffbe33, #ffa41b);
+  color: #fff;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.cta-section a {
+  background: #fff;
+  color: #333;
+  border-radius: 30px;
+  padding: 10px 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.cta-section a:hover {
+  background: #333;
+  color: #fff;
+}
+/* ===== Header cố định khi cuộn ===== */
+
+/* Hiển thị menu khi hover */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.user-dropdown-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 15px;
+  transition: color 0.3s ease;
+}
+
+.user-dropdown-trigger:hover {
+  color: #ffc107;
+}
+
+/* --- MENU --- */
+.user-dropdown-menu {
+  position: absolute;
+  top: 115%;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  min-width: 180px;
+  padding: 6px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.25s ease;
+  visibility: hidden;
+  z-index: 999;
+}
+
+.user-dropdown:hover .user-dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* --- ITEM --- */
+.user-dropdown-menu .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #222;
+  border-radius: 8px;
+  /* 🔥 Bo góc từng dòng */
+  margin: 2px 0;
+  /* 🔥 Có khoảng cách với viền */
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+  background-color: #fff6d0;
+  /* vàng nhạt nhẹ nhàng */
+  color: #000;
+}
+
+.user-dropdown-menu hr {
+  margin: 6px 0;
+  border-top: 1px solid #eee;
+}
+
+.header_section {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  padding: 15px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Khi cuộn xuống */
+.header_section.scrolled {
+  background-color: rgba(0, 0, 0, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 10px 0;
+}
+
+/* ===== Menu ===== */
+.header_section .nav-link {
+  transition: color 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.header_section .nav-link:hover {
+  color: #ffc107 !important;
+}
+
+/* ===== Active ===== */
+.header_section .nav-item.active .nav-link {
+  color: #ffc107 !important;
+  font-weight: 700;
+  position: relative;
+}
+
+.header_section .nav-item.active .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 2px;
+  background-color: #ffc107;
+  border-radius: 1px;
+}
+
+/* Ngăn xuống dòng và căn chỉnh user góc phải */
+.user_option {
+  flex-shrink: 0;
+}
+
+body {
+  padding-top: 90px;
+  /* tránh nội dung bị che bởi header */
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .user_option {
+    margin-top: 10px;
+    justify-content: center;
+  }
+
+  body {
+    padding-top: 120px;
+  }
+}
+
