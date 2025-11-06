@@ -4,17 +4,17 @@ session_start();
 
 // Messages
 $message_form = '';
-$message_modal = ''; // for generic modal feedback (we will map per masach)
-$modal_to_open = 0; // masach id of modal to re-open if needed
+$message_modal = ''; // for generic modal feedback (we will map per idsach)
+$modal_to_open = 0; // idsach id of modal to re-open if needed
 
-// Helper: get or create user by email, return manguoidung or false on error
+// Helper: get or create user by email, return idnguoidung or false on error
 function get_or_create_user($ketnoi, $hoten, $email)
 {
     $hoten = trim($hoten);
     $email = trim($email);
 
     // check existing
-    $stmt = mysqli_prepare($ketnoi, "SELECT manguoidung FROM nguoidung WHERE email = ?");
+    $stmt = mysqli_prepare($ketnoi, "SELECT idnguoidung FROM nguoidung WHERE email = ?");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_bind_result($stmt, $uid);
@@ -40,10 +40,10 @@ function get_or_create_user($ketnoi, $hoten, $email)
 }
 
 // Helper: check if user already borrowed the book and not returned
-function is_already_borrowed($ketnoi, $manguoidung, $masach)
+function is_already_borrowed($ketnoi, $idnguoidung, $idsach)
 {
-    $q = mysqli_prepare($ketnoi, "SELECT COUNT(*) FROM muonsach WHERE manguoidung = ? AND masach = ? AND trangthai != 'da_tra'");
-    mysqli_stmt_bind_param($q, 'ii', $manguoidung, $masach);
+    $q = mysqli_prepare($ketnoi, "SELECT COUNT(*) FROM muonsach WHERE idnguoidung = ? AND idsach = ? AND trangthai != 'da_tra'");
+    mysqli_stmt_bind_param($q, 'ii', $idnguoidung, $idsach);
     mysqli_stmt_execute($q);
     mysqli_stmt_bind_result($q, $cnt);
     mysqli_stmt_fetch($q);
@@ -52,11 +52,11 @@ function is_already_borrowed($ketnoi, $manguoidung, $masach)
 }
 
 // Helper: borrow book (insert muonsach)
-function borrow_book($ketnoi, $manguoidung, $masach, $ngaymuon, $hantra)
+function borrow_book($ketnoi, $idnguoidung, $idsach, $ngaymuon, $hantra)
 {
     $trangthai = 'dang_muon';
-    $ins = mysqli_prepare($ketnoi, "INSERT INTO muonsach (manguoidung, masach, ngaymuon, hantra, trangthai) VALUES (?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($ins, 'iisss', $manguoidung, $masach, $ngaymuon, $hantra, $trangthai);
+    $ins = mysqli_prepare($ketnoi, "INSERT INTO muonsach (idnguoidung, idsach, ngaymuon, hantra, trangthai) VALUES (?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($ins, 'iisss', $idnguoidung, $idsach, $ngaymuon, $hantra, $trangthai);
     $ok = mysqli_stmt_execute($ins);
     mysqli_stmt_close($ins);
     return $ok;
@@ -68,44 +68,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form_type = isset($_POST['form_type']) ? $_POST['form_type'] : 'form';
     $hoten = isset($_POST['hoten']) ? trim($_POST['hoten']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $masach = isset($_POST['masach']) ? intval($_POST['masach']) : 0;
+    $idsach = isset($_POST['idsach']) ? intval($_POST['idsach']) : 0;
     $ngaymuon = isset($_POST['ngaymuon']) ? $_POST['ngaymuon'] : date('Y-m-d');
     $hantra = isset($_POST['hantra']) ? $_POST['hantra'] : date('Y-m-d', strtotime('+7 days'));
 
     // Validate minimal
-    if ($hoten === '' || $email === '' || $masach <= 0) {
+    if ($hoten === '' || $email === '' || $idsach <= 0) {
         if ($form_type === 'modal') {
             $message_modal = '<div class="alert alert-danger">Vui lòng nhập đủ Họ tên, Email và chọn sách.</div>';
-            $modal_to_open = $masach;
+            $modal_to_open = $idsach;
         } else {
             $message_form = '<div class="alert alert-danger">Vui lòng nhập đủ Họ tên, Email và chọn sách.</div>';
         }
     } else {
         // Get or create user
-        $manguoidung = get_or_create_user($ketnoi, $hoten, $email);
-        if ($manguoidung === false) {
+        $idnguoidung = get_or_create_user($ketnoi, $hoten, $email);
+        if ($idnguoidung === false) {
             if ($form_type === 'modal') {
                 $message_modal = '<div class="alert alert-danger">Lỗi hệ thống khi tạo người dùng. Vui lòng thử lại.</div>';
-                $modal_to_open = $masach;
+                $modal_to_open = $idsach;
             } else {
                 $message_form = '<div class="alert alert-danger">Lỗi hệ thống khi tạo người dùng. Vui lòng thử lại.</div>';
             }
         } else {
             // Check duplicate borrow
-            if (is_already_borrowed($ketnoi, $manguoidung, $masach)) {
+            if (is_already_borrowed($ketnoi, $idnguoidung, $idsach)) {
                 if ($form_type === 'modal') {
                     $message_modal = '<div class="alert alert-warning">Bạn đang mượn cuốn sách này và chưa trả.</div>';
-                    $modal_to_open = $masach;
+                    $modal_to_open = $idsach;
                 } else {
                     $message_form = '<div class="alert alert-warning">Bạn đang mượn cuốn sách này và chưa trả.</div>';
                 }
             } else {
                 // Insert borrow
-                $ok = borrow_book($ketnoi, $manguoidung, $masach, $ngaymuon, $hantra);
+                $ok = borrow_book($ketnoi, $idnguoidung, $idsach, $ngaymuon, $hantra);
                 if ($ok) {
                     if ($form_type === 'modal') {
                         $message_modal = '<div class="alert alert-success">✅ Mượn sách thành công! Nhân viên thư viện sẽ xác nhận.</div>';
-                        $modal_to_open = $masach;
+                        $modal_to_open = $idsach;
                     } else {
                         $message_form = '<div class="alert alert-success">✅ Mượn sách thành công! Nhân viên thư viện sẽ xác nhận.</div>';
                     }
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     if ($form_type === 'modal') {
                         $message_modal = '<div class="alert alert-danger">Có lỗi khi ghi dữ liệu. Vui lòng thử lại.</div>';
-                        $modal_to_open = $masach;
+                        $modal_to_open = $idsach;
                     } else {
                         $message_form = '<div class="alert alert-danger">Có lỗi khi ghi dữ liệu. Vui lòng thử lại.</div>';
                     }
@@ -150,109 +150,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- custom styles -->
     <link href="css/style.css" rel="stylesheet" />
     <link href="css/responsive.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/header.css">
     <link href="css/index.css" rel="stylesheet">
     <link href="css/footer.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="index-page">
     <div class="hero_area">
         <div class="bg-box">
             <img src="images/baner3.png" alt="Banner Thư viện">
         </div>
-
-        <!-- Header -->
-        <?php
-        $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
-        session_start();
-        ?>
-        <header class="header_section">
-            <div class="container">
-                <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-
-                    <!-- Logo -->
-                    <a class="navbar-brand d-flex align-items-center" href="index.php">
-                        <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-                        <span style="font-weight: bold; font-size: 20px; color: #fff;">
-                            THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-                        </span>
-                    </a>
-
-                    <!-- Nút mở menu khi mobile -->
-                    <button class="navbar-toggler" type="button" data-toggle="collapse"
-                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-
-                    <!-- Menu chính -->
-                    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                        <ul class="navbar-nav text-uppercase fw-bold">
-                            <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
-                                <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-                            </li>
-                            <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
-                                <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-                            </li>
-                            <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
-                                <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-                            </li>
-                            <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
-                                <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Góc phải: user -->
-                    <div class="user_option d-flex align-items-center" style="gap: 12px;">
-                        <?php if (isset($_SESSION['hoten'])): ?>
-                            <div class="user-dropdown">
-                                <div class="user-dropdown-trigger">
-                                    <i class="fa fa-user-circle text-warning" style="font-size:18px;"></i>
-                                    Xin chào, <b><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
-                                </div>
-
-                                <div class="user-dropdown-menu">
-                                    <a href="yeuthich.php" class="dropdown-item">
-                                        Yêu thích
-                                    </a>
-                                    <a href="lichsu.php" class="dropdown-item">
-                                        Lịch sử mượn sách
-                                    </a>
-                                    <hr>
-                                    <a href="dangxuat.php" class="dropdown-item text-danger">
-                                        Đăng xuất
-                                    </a>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-                                style="border-radius:25px; padding:6px 20px;">
-                                <i class="fa fa-user mr-2"></i> Đăng nhập
-                            </a>
-                        <?php endif; ?>
-                    </div>
-
-
-                </nav>
-            </div>
-
-            <!-- Script hiệu ứng khi cuộn -->
-            <script>
-                window.addEventListener("scroll", function() {
-                    const header = document.querySelector(".header_section");
-                    if (window.scrollY > 10) {
-                        header.classList.add("scrolled");
-                    } else {
-                        header.classList.remove("scrolled");
-                    }
-                });
-            </script>
-        </header>
-
-
-
-        <!-- end header section -->
-
+        <?php include 'header.php'; ?>
         <!-- slider section -->
         <section class="slider_section ">
             <div id="customCarousel1" class="carousel slide" data-ride="carousel">
@@ -382,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sql_all = "SELECT sach.*, loaisach.tenloaisach, tacgia.tentacgia
                   FROM sach
                   LEFT JOIN loaisach ON sach.idloaisach = loaisach.idloaisach
-                  LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia
+                  LEFT JOIN tacgia ON sach.idtacgia = tacgia.idtacgia
                   ORDER BY sach.tensach ASC
                   LIMIT 8";
                 $res = mysqli_query($ketnoi, $sql_all);
@@ -390,15 +298,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($res && mysqli_num_rows($res) > 0) {
                     while ($r = mysqli_fetch_assoc($res)) {
                         $img = 'images/' . $r['hinhanhsach'];
-                        $masach = (int)$r['masach'];
+                        $idsach = (int)$r['idsach'];
                 ?>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="card book-card shadow-sm border-0 rounded-4 overflow-hidden h-100 position-relative">
 
                                 <!-- Nút yêu thích -->
                                 <button
-                                    class="favorite-btn <?php echo isset($_SESSION['manguoidung']) && mysqli_num_rows(mysqli_query($ketnoi, "SELECT * FROM yeuthich WHERE manguoidung = {$_SESSION['manguoidung']} AND masach = {$r['masach']}")) > 0 ? 'liked' : ''; ?>"
-                                    data-id="<?php echo $r['masach']; ?>">
+                                    class="favorite-btn <?php echo isset($_SESSION['idnguoidung']) && mysqli_num_rows(mysqli_query($ketnoi, "SELECT * FROM yeuthich WHERE idnguoidung = {$_SESSION['idnguoidung']} AND idsach = {$r['idsach']}")) > 0 ? 'liked' : ''; ?>"
+                                    data-id="<?php echo $r['idsach']; ?>">
                                     <i class="fa fa-heart"></i>
                                 </button>
 
@@ -417,11 +325,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php echo htmlspecialchars($r['tenloaisach']); ?>
                                     </p>
                                     <div class="mt-auto d-flex justify-content-center gap-2">
-                                        <a href="chitietsach.php?masach=<?php echo $masach; ?>"
+                                        <a href="chitietsach.php?idsach=<?php echo $idsach; ?>"
                                             class="btn btn-sm btn-primary rounded-pill px-3">
                                             Chi tiết
                                         </a>
-                                        <a href="book.php?masach=<?php echo $masach; ?>"
+                                        <a href="book.php?idsach=<?php echo $idsach; ?>"
                                             class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3">
                                             Mượn
                                         </a>
@@ -466,11 +374,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3 class="text-center mb-4">📚 Mượn Sách Gần Đây</h3>
             <ul class="list-group">
                 <?php
-                $sql = "SELECT m.mamuon, n.hoten, s.tensach, m.trangthai 
+                $sql = "SELECT m.idmuon, n.hoten, s.tensach, m.trangthai 
                 FROM muonsach m
-                JOIN nguoidung n ON m.manguoidung = n.idnguoidung
-                JOIN sach s ON m.masach = s.masach
-                ORDER BY m.mamuon DESC LIMIT 5";
+                JOIN nguoidung n ON m.idnguoidung = n.idnguoidung
+                JOIN sach s ON m.idsach = s.idsach
+                ORDER BY m.idmuon DESC LIMIT 5";
                 $query = mysqli_query($ketnoi, $sql);
                 if (mysqli_num_rows($query) > 0) {
                     while ($row = mysqli_fetch_assoc($query)) {
@@ -520,47 +428,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer_section mt-auto">
-        <div class="container">
-            <div class="row gy-4 justify-content-between align-items-start">
-                <!-- Cột 1: Liên hệ -->
-                <div class="col-md-4 col-sm-12 text-center text-md-start">
-                    <h4 class="footer_title">Liên Hệ</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>📍 60 QL1A, xã Thường Tín, TP. Hà Nội</li>
-                        <li>📞 1800 6770</li>
-                        <li>✉️ contact@ctech.edu.vn</li>
-                    </ul>
-                </div>
-
-                <!-- Cột 2: Giới thiệu -->
-                <div class="col-md-4 col-sm-12 text-center">
-                    <h4 class="footer_title">Giới Thiệu</h4>
-                    <p class="footer_text">
-                        Trang web quản lý thư viện giúp việc mượn – trả sách dễ dàng, tiết kiệm thời gian và hiệu quả
-                        hơn.
-                    </p>
-                </div>
-
-                <!-- Cột 3: Giờ mở cửa -->
-                <div class="col-md-4 col-sm-12 text-center text-md-end">
-                    <h4 class="footer_title">Giờ Mở Cửa</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>🕒 Thứ 2 - Thứ 6: 7h30 - 17h00</li>
-                        <li>🕒 Thứ 7: 8h00 - 11h30</li>
-                    </ul>
-                </div>
-            </div>
-
-            <hr class="footer_line">
-            <p class="text-center mt-3 footer_copy">
-                &copy; <?php echo date("Y"); ?> <b>Thư Viện Trường Học</b> | Thiết kế bởi <span
-                    class="text-warning">CTECH</span>
-            </p>
-        </div>
-    </footer>
-
     <!-- Thông báo nhỏ nút yêu thích -->
     <div id="toast-container"></div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -582,13 +449,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $(document).on("click", ".favorite-btn", function() {
             const btn = $(this);
-            const masach = btn.data("id");
+            const idsach = btn.data("id");
 
             $.ajax({
                 url: "xuly_yeuthich.php",
                 type: "POST",
                 data: {
-                    masach: masach
+                    idsach: idsach
                 },
                 dataType: "json",
                 success: function(res) {
@@ -608,12 +475,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
     </script>
-
-
-
-
-
     <!-- JS -->
+
     <script>
         const toggleBtn = document.getElementById("userToggle");
         const dropdown = document.getElementById("userDropdown");
@@ -636,11 +499,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             dropdown.addEventListener("mouseleave", () => dropdown.classList.remove("show"));
         }
     </script>
-
+    <!-- Footer -->
+    <?php include 'footer.php'; ?>
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/custom.js"></script>
-    <scriptz src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <scriptz src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+        </script>
 </body>
-
 </html>

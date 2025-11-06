@@ -1,9 +1,9 @@
 <?php
 include('ketnoi.php');
 
-if (isset($_GET['masach'])) {
-  $masach = intval($_GET['masach']);
-  $sql_sach = "SELECT * FROM sach WHERE masach = $masach";
+if (isset($_GET['idsach'])) {
+  $idsach = intval($_GET['idsach']);
+  $sql_sach = "SELECT * FROM sach WHERE idsach = $idsach";
   $result_sach = mysqli_query($ketnoi, $sql_sach);
   $sach = mysqli_fetch_assoc($result_sach);
 
@@ -18,7 +18,7 @@ if (isset($_GET['masach'])) {
     if ($sach['Soluong'] <= 0) {
       echo "<script>
               alert('❌ Sách này hiện đã hết! Không thể mượn thêm.');
-              window.location.href='chitietsach.php?masach=$masach';
+              window.location.href='chitietsach.php?idsach=$idsach';
             </script>";
       exit;
     }
@@ -27,21 +27,21 @@ if (isset($_GET['masach'])) {
     $check = mysqli_query($ketnoi, "SELECT * FROM nguoidung WHERE email = '$email'");
     if (mysqli_num_rows($check) > 0) {
       $user = mysqli_fetch_assoc($check);
-      $manguoidung = $user['manguoidung'];
+      $idnguoidung = $user['idnguoidung'];
     } else {
       mysqli_query($ketnoi, "INSERT INTO nguoidung (hoten, email, matkhau, vaitro) 
                              VALUES ('$hoten', '$email', '12345', 'hoc_sinh')");
-      $manguoidung = mysqli_insert_id($ketnoi);
+      $idnguoidung = mysqli_insert_id($ketnoi);
     }
 
     // ✅ 3. Thêm bản ghi mượn
-    $sql_muon = "INSERT INTO muonsach (manguoidung, masach, ngaymuon, hantra, trangthai)
-                 VALUES ($manguoidung, $masach, '$ngaymuon', '$hantra', '$trangthai')";
+    $sql_muon = "INSERT INTO muonsach (idnguoidung, idsach, ngaymuon, hantra, trangthai)
+                 VALUES ($idnguoidung, $idsach, '$ngaymuon', '$hantra', '$trangthai')";
     $result_muon = mysqli_query($ketnoi, $sql_muon);
 
     if ($result_muon) {
       // ✅ 4. Giảm số lượng sách đi 1
-      $sql_update = "UPDATE sach SET Soluong = Soluong - 1 WHERE masach = $masach";
+      $sql_update = "UPDATE sach SET Soluong = Soluong - 1 WHERE idsach = $idsach";
       mysqli_query($ketnoi, $sql_update);
 
       echo "<script>
@@ -62,49 +62,53 @@ if (isset($_GET['masach'])) {
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <title>Mượn Sách - <?php echo htmlspecialchars($sach['tensach']); ?></title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <link href="css/footer.css" rel="stylesheet">
+  <link href="css/header.css" rel="stylesheet">
   <link href="css/muonsach.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div class="container py-5">
-  <div class="card p-4 mx-auto" style="max-width: 700px;">
-    <div class="text-center mb-4">
-      <img src="http://localhost/thuvien/feane/images/<?php echo htmlspecialchars($sach['hinhanhsach']); ?>" 
-     alt="<?php echo htmlspecialchars($sach['tensach']); ?>" 
-     class="img-fluid book-image" style="max-height: 280px;">
+  <div class="container py-5">
+    <div class="card p-4 mx-auto" style="max-width: 700px;">
+      <div class="text-center mb-4">
+        <img src="http://localhost/thuvien/feane/images/<?php echo htmlspecialchars($sach['hinhanhsach']); ?>"
+          alt="<?php echo htmlspecialchars($sach['tensach']); ?>"
+          class="img-fluid book-image" style="max-height: 280px;">
 
+      </div>
+
+      <h3 class="text-center fw-bold mb-3"><?php echo htmlspecialchars($sach['tensach']); ?></h3>
+      <p class="text-center text-muted mb-4">
+        <b>Giá:</b> <?php echo number_format($sach['dongia']); ?> VNĐ &nbsp; | &nbsp;
+        <b>Còn lại:</b> <?php echo $sach['Soluong']; ?> cuốn
+      </p>
+
+      <form method="POST" class="px-3">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Họ và tên</label>
+          <input type="text" name="hoten" class="form-control form-control-lg" placeholder="Nhập họ tên của bạn" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email</label>
+          <input type="email" name="email" class="form-control form-control-lg" placeholder="Nhập email của bạn" required>
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">📘 Xác nhận mượn sách</button>
+          <a href="index.php" class="btn btn-outline-secondary px-5 py-2 ms-2 fw-bold">⬅ Quay lại</a>
+        </div>
+      </form>
     </div>
-
-    <h3 class="text-center fw-bold mb-3"><?php echo htmlspecialchars($sach['tensach']); ?></h3>
-    <p class="text-center text-muted mb-4">
-      <b>Giá:</b> <?php echo number_format($sach['dongia']); ?> VNĐ &nbsp; | &nbsp;
-      <b>Còn lại:</b> <?php echo $sach['Soluong']; ?> cuốn
-    </p>
-
-    <form method="POST" class="px-3">
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Họ và tên</label>
-        <input type="text" name="hoten" class="form-control form-control-lg" placeholder="Nhập họ tên của bạn" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label fw-semibold">Email</label>
-        <input type="email" name="email" class="form-control form-control-lg" placeholder="Nhập email của bạn" required>
-      </div>
-
-      <div class="text-center mt-4">
-        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">📘 Xác nhận mượn sách</button>
-        <a href="index.php" class="btn btn-outline-secondary px-5 py-2 ms-2 fw-bold">⬅ Quay lại</a>
-      </div>
-    </form>
   </div>
-</div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
+
 </html>

@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       mysqli_stmt_fetch($stmt);
 
       if (password_verify($matkhau, $hash)) {
+        // Lưu session
         $_SESSION['idnguoidung'] = $idnguoidung;
         $_SESSION['hoten'] = $hoten;
         $_SESSION['email'] = $email;

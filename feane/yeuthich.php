@@ -3,23 +3,23 @@ session_start();
 require_once('ketnoi.php');
 
 // Kiểm tra đăng nhập
-if (!isset($_SESSION['manguoidung'])) {
+if (!isset($_SESSION['idnguoidung'])) {
     header('Location: dangnhap.php');
     exit;
 }
 
-$manguoidung = $_SESSION['manguoidung'];
+$idnguoidung = $_SESSION['idnguoidung'];
 
 // Lấy danh sách sách yêu thích
 $stmt = $ketnoi->prepare("
     SELECT sach.*, loaisach.tenloaisach, tacgia.tentacgia
     FROM yeuthich
-    JOIN sach ON yeuthich.masach = sach.masach
+    JOIN sach ON yeuthich.idsach = sach.idsach
     LEFT JOIN loaisach ON sach.idloaisach = loaisach.idloaisach
-    LEFT JOIN tacgia ON sach.matacgia = tacgia.matacgia
-    WHERE yeuthich.manguoidung = ?
+    LEFT JOIN tacgia ON sach.idtacgia = tacgia.idtacgia
+    WHERE yeuthich.idnguoidung = ?
 ");
-$stmt->bind_param("i", $manguoidung);
+$stmt->bind_param("i", $idnguoidung);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -35,6 +35,7 @@ $result = $stmt->get_result();
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link href="css/header.css" rel="stylesheet">
     <link href="css/footer.css" rel="stylesheet">
     <link href="css/yeuthich.css" rel="stylesheet">
 </head>
@@ -42,91 +43,7 @@ $result = $stmt->get_result();
 <body>
 
     <!-- Header -->
-    <?php
-    $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
-    ?>
-    <header class="header_section">
-        <div class="container">
-            <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-
-                <!-- Logo -->
-                <a class="navbar-brand d-flex align-items-center" href="index.php">
-                    <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-                    <span style="font-weight: bold; font-size: 20px; color: #fff;">
-                        THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-                    </span>
-                </a>
-
-                <!-- Nút mở menu khi mobile -->
-                <button class="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Menu chính -->
-                <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                    <ul class="navbar-nav text-uppercase fw-bold">
-                        <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Góc phải: user -->
-                <div class="user_option d-flex align-items-center" style="gap: 12px;">
-                    <?php if (isset($_SESSION['hoten'])): ?>
-                        <div class="user-dropdown">
-                            <div class="user-dropdown-trigger">
-                                <i class="fa fa-user-circle text-warning" style="font-size:18px;"></i>
-                                Xin chào, <b><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
-                            </div>
-
-                            <div class="user-dropdown-menu">
-                                <a href="yeuthich.php" class="dropdown-item">
-                                    Yêu thích
-                                </a>
-                                <a href="lichsu.php" class="dropdown-item">
-                                    Lịch sử mượn sách
-                                </a>
-                                <hr>
-                                <a href="dangxuat.php" class="dropdown-item text-danger">
-                                    Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    <?php else: ?>
-                        <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-                            style="border-radius:25px; padding:6px 20px;">
-                            <i class="fa fa-user mr-2"></i> Đăng nhập
-                        </a>
-                    <?php endif; ?>
-                </div>
-
-
-            </nav>
-        </div>
-        <!-- Script hiệu ứng khi cuộn -->
-        <script>
-            window.addEventListener("scroll", function() {
-                const header = document.querySelector(".header_section");
-                if (window.scrollY > 10) {
-                    header.classList.add("scrolled");
-                } else {
-                    header.classList.remove("scrolled");
-                }
-            });
-        </script>
-    </header>
+    <?php include 'header.php'; ?>
     <!-- end header section -->
 
     <!-- MAIN -->
@@ -141,7 +58,7 @@ $result = $stmt->get_result();
                     <?php while ($r = mysqli_fetch_assoc($result)): ?>
                         <div class="col-sm-6 col-md-4 col-lg-3">
                             <div class="card book-card h-100">
-                                <button class="favorite-btn" data-id="<?php echo $r['masach']; ?>">
+                                <button class="favorite-btn" data-id="<?php echo $r['idsach']; ?>">
                                     <i class="fa fa-heart"></i>
                                 </button>
                                 <img src="images/<?php echo htmlspecialchars($r['hinhanhsach']); ?>" alt="">
@@ -151,7 +68,7 @@ $result = $stmt->get_result();
                                         <p class="text-muted small mb-2"><?php echo htmlspecialchars($r['tentacgia']); ?></p>
                                         <p class="text-secondary small"><?php echo htmlspecialchars($r['tenloaisach']); ?></p>
                                     </div>
-                                    <a href="chitietsach.php?masach=<?php echo $r['masach']; ?>" class="btn btn-warning btn-sm rounded-pill mt-2">Xem chi tiết</a>
+                                    <a href="chitietsach.php?idsach=<?php echo $r['idsach']; ?>" class="btn btn-warning btn-sm rounded-pill mt-2">Xem chi tiết</a>
                                 </div>
                             </div>
                         </div>
@@ -167,10 +84,10 @@ $result = $stmt->get_result();
         $(document).on("click", ".favorite-btn", function() {
             const btn = $(this);
             const icon = btn.find("i");
-            const masach = btn.data("id");
+            const idsach = btn.data("id");
 
             $.post("xuly_yeuthich.php", {
-                masach
+                idsach
             }, function(res) {
                 if (res.status === "added") {
                     icon.addClass("text-danger"); // tô đỏ trái tim
@@ -196,44 +113,7 @@ $result = $stmt->get_result();
     </script>
 
     <!-- Footer -->
-    <footer class="footer_section mt-auto">
-        <div class="container">
-            <div class="row gy-4 justify-content-between align-items-start">
-                <!-- Cột 1: Liên hệ -->
-                <div class="col-md-4 col-sm-12 text-center text-md-start">
-                    <h4 class="footer_title">Liên Hệ</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>📍 60 QL1A, xã Thường Tín, TP. Hà Nội</li>
-                        <li>📞 1800 6770</li>
-                        <li>✉️ contact@ctech.edu.vn</li>
-                    </ul>
-                </div>
-
-                <!-- Cột 2: Giới thiệu -->
-                <div class="col-md-4 col-sm-12 text-center">
-                    <h4 class="footer_title">Giới Thiệu</h4>
-                    <p class="footer_text">
-                        Trang web quản lý thư viện giúp việc mượn – trả sách dễ dàng, tiết kiệm thời gian và hiệu quả
-                        hơn.
-                    </p>
-                </div>
-
-                <!-- Cột 3: Giờ mở cửa -->
-                <div class="col-md-4 col-sm-12 text-center text-md-end">
-                    <h4 class="footer_title">Giờ Mở Cửa</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>🕒 Thứ 2 - Thứ 6: 7h30 - 17h00</li>
-                        <li>🕒 Thứ 7: 8h00 - 11h30</li>
-                    </ul>
-                </div>
-            </div>
-
-            <hr class="footer_line">
-            <p class="text-center mt-3 footer_copy">
-                &copy; <?php echo date("Y"); ?> <b>Thư Viện Trường Học</b> | Thiết kế bởi <span
-                    class="text-warning">CTECH</span>
-            </p>
-        </div>
+    <?php include 'footer.php'; ?>
         <!-- JS -->
         <script>
             const toggleBtn = document.getElementById("userToggle");
@@ -265,10 +145,10 @@ $result = $stmt->get_result();
             $(document).on("click", ".favorite-btn", function() {
                 const btn = $(this);
                 const icon = btn.find("i");
-                const masach = btn.data("id");
+                const idsach = btn.data("id");
 
                 $.post("xuly_yeuthich.php", {
-                    masach
+                    idsach
                 }, function(res) {
                     if (res.status === "added") {
                         icon.addClass("text-danger"); // tô đỏ trái tim
@@ -293,7 +173,5 @@ $result = $stmt->get_result();
             });
         </script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
-
 </html>

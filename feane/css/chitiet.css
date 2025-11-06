@@ -1,70 +1,145 @@
+/* ===== NỀN TOÀN TRANG ===== */
 body {
-  background: linear-gradient(135deg, #e9f0f7, #fdfdfd);
-  font-family: "Poppins", sans-serif;
+  background-color: #101010;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px
+  );
+  background-size: 30px 30px;
+  color: #fff;
+  padding-top: 90px;
 }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .user_option {
+    margin-top: 10px;
+    justify-content: center;
+  }
+
+  body {
+    padding-top: 120px;
+  }
+}
+
+/* ===== KHỐI CHI TIẾT SÁCH ===== */
 .book-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
 }
+
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(255, 193, 7, 0.25);
+}
+
+/* ===== ẢNH SÁCH ===== */
 .book-image {
-  border-radius: 20px 0 0 20px;
-  height: 100%;
   width: 100%;
+  height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  border-radius: 20px 0 0 20px;
+  transition: transform 0.4s ease, filter 0.3s ease;
 }
+
 .book-image:hover {
   transform: scale(1.05);
+  filter: brightness(1.05);
 }
+
+/* ===== THÔNG TIN SÁCH ===== */
 .book-info {
   padding: 40px;
 }
+
 .book-title {
   font-weight: 700;
-  color: #222;
+  font-size: 28px;
+  color: #ffc107;
+  margin-bottom: 15px;
 }
+
 .book-meta p {
   margin-bottom: 6px;
-  color: #555;
+  color: #ddd;
   font-size: 16px;
 }
+
 .book-price {
   font-size: 22px;
-  color: #e63946;
+  color: #ff4444;
   font-weight: 700;
-  margin: 20px 0;
+  margin: 25px 0 20px;
 }
+
+.book-info p {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+/* ===== NÚT HÀNH ĐỘNG ===== */
 .btn-main {
-  background: linear-gradient(to right, #007bff, #00c6ff);
+  background: linear-gradient(135deg, #ffbe33, #ff8f00);
   border: none;
-  color: #fff;
-  font-weight: 600;
-  padding: 10px 24px;
-  border-radius: 10px;
-  transition: 0.3s;
+  color: #000;
+  font-weight: 700;
+  padding: 10px 28px;
+  border-radius: 50px;
+  transition: all 0.3s ease;
 }
+
 .btn-main:hover {
-  background: linear-gradient(to right, #0062cc, #0097e6);
+  background: linear-gradient(135deg, #ffca2c, #ffb300);
   transform: translateY(-2px);
 }
+
 .btn-back {
-  border: 2px solid #bbb;
-  background: white;
-  color: #444;
+  border: 2px solid #ffc107;
+  background: transparent;
+  color: #ffc107;
   font-weight: 600;
-  border-radius: 10px;
-  padding: 10px 24px;
+  border-radius: 50px;
+  padding: 10px 28px;
+  transition: all 0.3s ease;
 }
+
 .btn-back:hover {
-  background: #f3f3f3;
+  background: #ffc107;
+  color: #000;
+  transform: translateY(-2px);
 }
+
+/* ===== HEADER DÀNH CHO TRANG CHI TIẾT ===== */
+.header_detail {
+  background: rgba(0, 0, 0, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 999;
+}
+
+.header_detail.scrolled {
+  background: rgba(0, 0, 0, 1);
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .book-image {
     border-radius: 20px 20px 0 0;
   }
+
   .book-info {
     padding: 25px;
+  }
+
+  .book-title {
+    font-size: 22px;
   }
 }

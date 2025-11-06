@@ -24,103 +24,18 @@ session_start();
     <!-- Custom -->
     <link href="css/style.css" rel="stylesheet">
     <link href="css/responsive.css" rel="stylesheet">
+    <link href="css/header.css" rel="stylesheet">
     <link href="css/about.css" rel="stylesheet">
     <link href="css/footer.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="about-page">
     <?php
     $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
     ?>
     <!-- Header -->
-    <?php
-    $current_page = basename($_SERVER['PHP_SELF']); // Lấy tên file hiện tại (vd: menu.php)
-    ?>
-    <header class="header_section">
-        <div class="container">
-            <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-
-                <!-- Logo -->
-                <a class="navbar-brand d-flex align-items-center" href="index.php">
-                    <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-                    <span style="font-weight: bold; font-size: 20px; color: #fff;">
-                        THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-                    </span>
-                </a>
-
-                <!-- Nút mở menu khi mobile -->
-                <button class="navbar-toggler" type="button" data-toggle="collapse"
-                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none;">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Menu chính -->
-                <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                    <ul class="navbar-nav text-uppercase fw-bold">
-                        <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-                        </li>
-                        <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
-                            <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Góc phải: user -->
-                <div class="user_option d-flex align-items-center" style="gap: 12px;">
-                    <?php if (isset($_SESSION['hoten'])): ?>
-                        <div class="user-dropdown">
-                            <div class="user-dropdown-trigger">
-                                <i class="fa fa-user-circle text-warning" style="font-size:18px;"></i>
-                                Xin chào, <b><?php echo htmlspecialchars($_SESSION['hoten']); ?></b>
-                            </div>
-
-                            <div class="user-dropdown-menu">
-                                <a href="yeuthich.php" class="dropdown-item">
-                                    Yêu thích
-                                </a>
-                                <a href="lichsu.php" class="dropdown-item">
-                                    Lịch sử mượn sách
-                                </a>
-                                <hr>
-                                <a href="dangxuat.php" class="dropdown-item text-danger">
-                                    Đăng xuất
-                                </a>
-                            </div>
-                        </div>
-                    <?php else: ?>
-                        <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
-                            style="border-radius:25px; padding:6px 20px;">
-                            <i class="fa fa-user mr-2"></i> Đăng nhập
-                        </a>
-                    <?php endif; ?>
-                </div>
-
-
-            </nav>
-        </div>
-        <!-- Script hiệu ứng khi cuộn -->
-        <script>
-            window.addEventListener("scroll", function() {
-                const header = document.querySelector(".header_section");
-                if (window.scrollY > 10) {
-                    header.classList.add("scrolled");
-                } else {
-                    header.classList.remove("scrolled");
-                }
-            });
-        </script>
-    </header>
+     <?php include 'header.php'; ?>
     <!-- end header section -->
-
-
 
     <!-- Giới thiệu -->
     <section class="about-section">
@@ -229,43 +144,7 @@ session_start();
     </section>
 
     <!-- Footer -->
-    <footer class="footer_section mt-auto">
-        <div class="container">
-            <div class="row gy-4 justify-content-between align-items-start">
-                <!-- Cột 1: Liên hệ -->
-                <div class="col-md-4 col-sm-12 text-center text-md-start">
-                    <h4 class="footer_title">Liên Hệ</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>📍 60 QL1A, xã Thường Tín, TP. Hà Nội</li>
-                        <li>📞 1800 6770</li>
-                        <li>✉️ contact@ctech.edu.vn</li>
-                    </ul>
-                </div>
-
-                <!-- Cột 2: Giới thiệu -->
-                <div class="col-md-4 col-sm-12 text-center">
-                    <h4 class="footer_title">Giới Thiệu</h4>
-                    <p class="footer_text">
-                        Trang web quản lý thư viện giúp việc mượn – trả sách dễ dàng, tiết kiệm thời gian và hiệu quả hơn.
-                    </p>
-                </div>
-
-                <!-- Cột 3: Giờ mở cửa -->
-                <div class="col-md-4 col-sm-12 text-center text-md-end">
-                    <h4 class="footer_title">Giờ Mở Cửa</h4>
-                    <ul class="list-unstyled footer_list">
-                        <li>🕒 Thứ 2 - Thứ 6: 7h30 - 17h00</li>
-                        <li>🕒 Thứ 7: 8h00 - 11h30</li>
-                    </ul>
-                </div>
-            </div>
-
-            <hr class="footer_line">
-            <p class="text-center mt-3 footer_copy">
-                &copy; <?php echo date("Y"); ?> <b>Thư Viện Trường Học</b> | Thiết kế bởi <span class="text-warning">CTECH</span>
-            </p>
-        </div>
-    </footer>
+    <?php include 'footer.php'; ?>
     <!-- JS -->
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/bootstrap.js"></script>
