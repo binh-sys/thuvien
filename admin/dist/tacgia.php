@@ -1,64 +1,81 @@
 <?php
 require_once('ketnoi.php');
+if (!isset($ketnoi)) exit("Kết nối thất bại");
 
-// Lấy danh sách tác giả
-$sql = "SELECT * FROM tacgia";
-$query = mysqli_query($ketnoi, $sql);
+$sql = "SELECT * FROM tacgia ORDER BY idtacgia DESC";
+$res = mysqli_query($ketnoi, $sql);
 ?>
 
-<!-- Content wrapper -->
-<div class="content-wrapper">
-  <!-- Content -->
-  <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light"></span> Quản lý Tác Giả</h4>
+<style>
+.table-wrap { overflow-x:auto; }
+.table th { background:#1e40af; color:#fff; }
+.table tr:hover { background:#f1f5f9; }
+.toast-msg {
+  position: fixed; top: 24px; right: 24px; z-index: 1055;
+  background: #1e3a8a; color: #fff; padding: 12px 20px;
+  border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  opacity: 0; transform: translateX(50px); transition: all .4s;
+}
+.toast-msg.show { opacity: 1; transform: translateX(0); }
+</style>
 
-    <!-- Basic Bootstrap Table -->
-    <div class="card">
-      <h5 class="card-header">Danh sách tác giả
-        <a href="?page_layout=themtacgia"><i class="bx bx-plus"></i></a>
-      </h5>
-
-      <div class="table-responsive text-nowrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>STT</th>
-              <th>Tên tác giả</th>
-              <th>Ghi chú</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody class="table-border-bottom-0">
-            <?php 
-            $i = 1;
-            while ($row = mysqli_fetch_assoc($query)) { ?>
-              <tr>
-                <td><strong><?php echo $i++; ?></strong></td>
-                <td><?php echo $row['tentacgia']; ?></td>
-                <td><?php echo $row['ghichu']; ?></td>
-                <td>
-                  <div class="dropdown">
-                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="bx bx-dots-vertical-rounded"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="?page_layout=suatacgia&id=<?php echo $row['matacgia']; ?>">
-                        <i class="bx bx-edit-alt me-1"></i> Sửa
-                      </a>
-                      <a class="dropdown-item" href="?page_layout=xoatacgia&id=<?php echo $row['matacgia']; ?>">
-                        <i class="bx bx-trash me-1"></i> Xóa
-                      </a>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            <?php } ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <!--/ Basic Bootstrap Table -->
+<div class="card shadow-sm p-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-primary"><i class="mdi mdi-account-edit"></i> Danh sách tác giả</h4>
+    <a href="index.php?page_layout=them_tacgia" class="btn btn-primary">
+      <i class="mdi mdi-plus"></i> Thêm tác giả
+    </a>
   </div>
-  <!-- / Content -->
+
+  <div class="table-wrap">
+    <table class="table align-middle table-bordered">
+      <thead>
+        <tr>
+          <th style="width:60px;">#</th>
+          <th>Tên tác giả</th>
+          <th>Ghi chú</th>
+          <th style="width:180px;">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        if (mysqli_num_rows($res) > 0) {
+          $i = 1;
+          while ($row = mysqli_fetch_assoc($res)) {
+            echo "<tr>
+              <td>{$i}</td>
+              <td>".htmlspecialchars($row['tentacgia'])."</td>
+              <td>".htmlspecialchars($row['ghichu'] ?? '')."</td>
+              <td>
+                <a href='index.php?page_layout=sua_tacgia&id={$row['idtacgia']}' class='btn btn-warning btn-sm'><i class='mdi mdi-pencil'></i> Sửa</a>
+                <a href='index.php?page_layout=xoa_tacgia&id={$row['idtacgia']}' class='btn btn-danger btn-sm' onclick=\"return confirm('Xóa tác giả này?')\"><i class='mdi mdi-delete'></i> Xóa</a>
+              </td>
+            </tr>";
+            $i++;
+          }
+        } else {
+          echo "<tr><td colspan='4' class='text-center text-muted py-3'>Chưa có tác giả nào</td></tr>";
+        }
+        ?>
+      </tbody>
+    </table>
+  </div>
 </div>
-<!-- / Content wrapper -->
+
+<script>
+// Hiển thị thông báo toast
+document.addEventListener('DOMContentLoaded', () => {
+  const toastData = localStorage.getItem('toast');
+  if (toastData) {
+    const { msg, type } = JSON.parse(toastData);
+    const el = document.createElement('div');
+    el.className = 'toast-msg';
+    el.textContent = msg;
+    el.style.background = type === 'success' ? '#16a34a' : '#dc2626';
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('show'), 100);
+    setTimeout(() => { el.classList.remove('show'); setTimeout(()=>el.remove(), 400); }, 2500);
+    localStorage.removeItem('toast');
+  }
+});
+</script>

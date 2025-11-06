@@ -1,57 +1,97 @@
 <?php
-if (!isset($ketnoi)) require_once('ketnoi.php');
-$tacgia = mysqli_query($ketnoi, "SELECT * FROM tacgia");
-$loai = mysqli_query($ketnoi, "SELECT * FROM loaisach");
+require_once('ketnoi.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $tensach = trim($_POST['tensach']);
-    $matacgia = $_POST['matacgia'];
-    $idloaisach = $_POST['idloaisach'];
-    $soluong = (int)$_POST['soluong'];
-    $hinhanhsach = '';
+// Lấy danh sách tác giả và thể loại
+$tacgia = mysqli_query($ketnoi, "SELECT * FROM tacgia ORDER BY tentacgia ASC");
+$loaisach = mysqli_query($ketnoi, "SELECT * FROM loaisach ORDER BY tenloaisach ASC");
 
-    if (!empty($_FILES['hinhanhsach']['name'])) {
-        $fname = basename($_FILES['hinhanhsach']['name']);
-        move_uploaded_file($_FILES['hinhanhsach']['tmp_name'], "images/$fname");
-        $hinhanhsach = $fname;
-    }
+if (isset($_POST['add_sach'])) {
+  $tensach = mysqli_real_escape_string($ketnoi, $_POST['tensach']);
+  $soluong = (int)$_POST['soluong'];
+  $dongia = (int)$_POST['dongia'];
+  $mota = mysqli_real_escape_string($ketnoi, $_POST['mota']);
+  $idtacgia = (int)$_POST['idtacgia'];
+  $idloaisach = (int)$_POST['idloaisach'];
 
-    $sql = "INSERT INTO sach (tensach, matacgia, idloaisach, soluong, hinhanhsach)
-            VALUES ('$tensach', '$matacgia', '$idloaisach', '$soluong', '$hinhanhsach')";
-    mysqli_query($ketnoi, $sql);
-    header("Location: index.php?page_layout=danhsachsach");
-    exit;
+  // upload ảnh
+  $hinhanh = '';
+  if (!empty($_FILES['hinhanhsach']['name'])) {
+    $file = $_FILES['hinhanhsach'];
+    $filename = time() . '_' . basename($file['name']);
+    move_uploaded_file($file['tmp_name'], "../../feane/images/$filename");
+    $hinhanh = $filename;
+  }
+
+  $sql = "INSERT INTO sach (tensach, soluong, dongia, hinhanhsach, mota, idtacgia, idloaisach, ngaynhap) 
+          VALUES ('$tensach', $soluong, $dongia, '$hinhanh', '$mota', $idtacgia, $idloaisach, NOW())";
+  if (mysqli_query($ketnoi, $sql)) {
+    $msg = "✅ Thêm sách thành công!";
+    echo "<script>showToast('$msg','success'); setTimeout(()=>window.location='index.php?page_layout=danhsachsach',1500);</script>";
+  } else {
+    $msg = "❌ Lỗi khi thêm sách!";
+    echo "<script>showToast('$msg','danger');</script>";
+  }
 }
 ?>
 
-<h3>➕ Thêm sách mới</h3>
-<form method="post" enctype="multipart/form-data" style="max-width:600px">
-  <label>Tên sách</label>
-  <input name="tensach" class="form-control" required>
+<div class="container mt-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0"><i class="bx bx-plus"></i> Thêm sách mới</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" enctype="multipart/form-data">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Tên sách</label>
+            <input type="text" name="tensach" class="form-control" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Số lượng</label>
+            <input type="number" name="soluong" class="form-control" required min="1">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Đơn giá (₫)</label>
+            <input type="number" name="dongia" class="form-control" required min="0">
+          </div>
+        </div>
 
-  <label>Tác giả</label>
-  <select name="matacgia" class="form-control" required>
-    <option value="">-- Chọn tác giả --</option>
-    <?php while($t=mysqli_fetch_assoc($tacgia)): ?>
-      <option value="<?= $t['matacgia'] ?>"><?= htmlspecialchars($t['tentacgia']) ?></option>
-    <?php endwhile; ?>
-  </select>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Ảnh bìa</label>
+          <input type="file" name="hinhanhsach" class="form-control">
+        </div>
 
-  <label>Thể loại</label>
-  <select name="idloaisach" class="form-control" required>
-    <option value="">-- Chọn thể loại --</option>
-    <?php while($l=mysqli_fetch_assoc($loai)): ?>
-      <option value="<?= $l['idloaisach'] ?>"><?= htmlspecialchars($l['tenloaisach']) ?></option>
-    <?php endwhile; ?>
-  </select>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Mô tả</label>
+          <textarea name="mota" class="form-control" rows="3"></textarea>
+        </div>
 
-  <label>Số lượng</label>
-  <input type="number" name="soluong" min="1" class="form-control" required>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Tác giả</label>
+            <select name="idtacgia" class="form-select" required>
+              <option value="">-- Chọn tác giả --</option>
+              <?php while ($tg = mysqli_fetch_assoc($tacgia)) { ?>
+                <option value="<?= $tg['idtacgia']; ?>"><?= htmlspecialchars($tg['tentacgia']); ?></option>
+              <?php } ?>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Thể loại</label>
+            <select name="idloaisach" class="form-select" required>
+              <option value="">-- Chọn thể loại --</option>
+              <?php while ($ls = mysqli_fetch_assoc($loaisach)) { ?>
+                <option value="<?= $ls['idloaisach']; ?>"><?= htmlspecialchars($ls['tenloaisach']); ?></option>
+              <?php } ?>
+            </select>
+          </div>
+        </div>
 
-  <label>Hình ảnh sách</label>
-  <input type="file" name="hinhanhsach" accept="image/*" class="form-control">
-
-  <br>
-  <button type="submit" class="btn btn-primary">Lưu</button>
-  <a href="index.php?page_layout=danhsachsach" class="btn btn-secondary">Hủy</a>
-</form>
+        <div class="d-flex justify-content-between">
+          <button type="submit" name="add_sach" class="btn btn-success px-4"><i class="bx bx-save"></i> Lưu</button>
+          <a href="index.php?page_layout=danhsachsach" class="btn btn-secondary px-4"><i class="bx bx-arrow-back"></i> Quay lại</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

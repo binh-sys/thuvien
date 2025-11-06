@@ -468,7 +468,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php
                 $sql = "SELECT m.mamuon, n.hoten, s.tensach, m.trangthai 
                 FROM muonsach m
-                JOIN nguoidung n ON m.manguoidung = n.manguoidung
+                JOIN nguoidung n ON m.manguoidung = n.idnguoidung
                 JOIN sach s ON m.masach = s.masach
                 ORDER BY m.mamuon DESC LIMIT 5";
                 $query = mysqli_query($ketnoi, $sql);

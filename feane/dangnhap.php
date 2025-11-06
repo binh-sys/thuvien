@@ -11,23 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($email === '' || $matkhau === '') {
     $message = '<div class="alert alert-danger text-center">Vui lòng nhập đầy đủ Email và Mật khẩu.</div>';
   } else {
-    $stmt = mysqli_prepare($ketnoi, "SELECT manguoidung, hoten, matkhau, vaitro FROM nguoidung WHERE email = ?");
+    $stmt = mysqli_prepare($ketnoi, "SELECT idnguoidung, hoten, matkhau, vaitro FROM nguoidung WHERE email = ?");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);
 
     if (mysqli_stmt_num_rows($stmt) > 0) {
-      mysqli_stmt_bind_result($stmt, $manguoidung, $hoten, $hash, $vaitro);
+      mysqli_stmt_bind_result($stmt, $idnguoidung, $hoten, $hash, $vaitro);
       mysqli_stmt_fetch($stmt);
 
       if (password_verify($matkhau, $hash)) {
-        // Lưu session
-        $_SESSION['manguoidung'] = $manguoidung;
+        $_SESSION['idnguoidung'] = $idnguoidung;
         $_SESSION['hoten'] = $hoten;
         $_SESSION['email'] = $email;
         $_SESSION['vaitro'] = $vaitro;
 
-        // Chuyển hướng về trang chủ
         header("Location: index.php");
         exit;
       } else {
@@ -39,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     mysqli_stmt_close($stmt);
   }
 }
+
+mysqli_close($ketnoi);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <div class="login-container">
     <h3>Đăng Nhập Hệ Thống</h3>
-    <?php echo $message; ?>
+    <?php if ($message != '') echo $message; ?>
     <form method="POST">
       <div class="form-group mb-3">
         <label for="email">Email</label>

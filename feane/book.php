@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($hoten) || empty($email) || empty($book_ids)) {
         $message_form = '<div class="alert alert-danger">⚠️ Vui lòng nhập đầy đủ thông tin và chọn ít nhất 1 sách.</div>';
     } else {
-        $stmt_user = mysqli_prepare($ketnoi, "SELECT manguoidung FROM nguoidung WHERE email=?");
+        $stmt_user = mysqli_prepare($ketnoi, "SELECT idnguoidung FROM nguoidung WHERE email=?");
         mysqli_stmt_bind_param($stmt_user, 's', $email);
         mysqli_stmt_execute($stmt_user);
         mysqli_stmt_bind_result($stmt_user, $uid);

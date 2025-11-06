@@ -1,17 +1,17 @@
 <?php
 require_once('ketnoi.php');
+session_start();
 
 if (isset($_GET['id'])) {
   $id = intval($_GET['id']);
-  $sql = "DELETE FROM nguoidung WHERE idnguoidung = $id";
+  $sql = "DELETE FROM nguoidung WHERE idnguoidung=$id";
+
   if (mysqli_query($ketnoi, $sql)) {
-    echo "<script>alert('✅ Xóa người dùng thành công!'); 
-          window.location='index.php?page_layout=danhsachnguoidung';</script>";
+    $_SESSION['toast'] = ['type' => 'success', 'msg' => '🗑️ Xóa người dùng thành công!'];
   } else {
-    echo "<script>alert('❌ Lỗi khi xóa người dùng!');</script>";
+    $_SESSION['toast'] = ['type' => 'error', 'msg' => '❌ Không thể xóa người dùng này!'];
   }
-} else {
-  header('Location: index.php?page_layout=danhsachnguoidung');
-  exit;
 }
-?>
+
+header("Location: index.php?page_layout=danhsachnguoidung");
+exit();

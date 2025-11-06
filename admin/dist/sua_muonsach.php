@@ -1,61 +1,100 @@
 <?php
-if (!isset($ketnoi)) require_once('ketnoi.php');
-$mamuon = $_GET['mamuon'] ?? '';
+require_once('ketnoi.php');
 
-$res = mysqli_query($ketnoi, "SELECT * FROM muonsach WHERE mamuon='$mamuon'");
-$data = mysqli_fetch_assoc($res);
-
-$nguoidung = mysqli_query($ketnoi, "SELECT idnguoidung, hoten FROM nguoidung ORDER BY hoten ASC");
-$sach = mysqli_query($ketnoi, "SELECT masach, tensach FROM sach ORDER BY tensach ASC");
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $manguoidung = mysqli_real_escape_string($ketnoi, $_POST['manguoidung']);
-    $masach = mysqli_real_escape_string($ketnoi, $_POST['masach']);
-    $ngaymuon = mysqli_real_escape_string($ketnoi, $_POST['ngaymuon']);
-    $hantra = mysqli_real_escape_string($ketnoi, $_POST['hantra']);
-
-    $sql = "UPDATE muonsach 
-            SET manguoidung='$manguoidung', masach='$masach', ngaymuon='$ngaymuon', hantra='$hantra' 
-            WHERE mamuon='$mamuon'";
-    if (mysqli_query($ketnoi, $sql)) {
-        echo "<script>alert('✅ Cập nhật thành công');window.location='index.php?page_layout=danhsachmuonsach';</script>";
-        exit;
-    } else {
-        echo "<script>alert('❌ Lỗi khi cập nhật');</script>";
-    }
+// Lấy id mượn cần sửa
+if (!isset($_GET['idmuon'])) {
+  echo "<script>alert('❌ Không xác định được phiếu mượn!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
+  exit;
 }
+$idmuon = $_GET['idmuon'];
+
+// Lấy dữ liệu hiện tại
+$query = "SELECT * FROM muonsach WHERE idmuon = '$idmuon'";
+$result = mysqli_query($ketnoi, $query);
+$muon = mysqli_fetch_assoc($result);
+
+if (!$muon) {
+  echo "<script>alert('❌ Không tìm thấy phiếu mượn!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
+  exit;
+}
+
+// Cập nhật khi submit
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $idnguoidung = $_POST['idnguoidung'];
+  $idsach = $_POST['idsach'];
+  $ngaymuon = $_POST['ngaymuon'];
+  $hantra = $_POST['hantra'];
+  $ngaytra_thucte = !empty($_POST['ngaytra_thucte']) ? $_POST['ngaytra_thucte'] : NULL;
+
+  $sql = "UPDATE muonsach 
+          SET idnguoidung='$idnguoidung', idsach='$idsach', ngaymuon='$ngaymuon', hantra='$hantra', ngaytra_thucte=" . 
+          ($ngaytra_thucte ? "'$ngaytra_thucte'" : "NULL") . " 
+          WHERE idmuon='$idmuon'";
+
+  if (mysqli_query($ketnoi, $sql)) {
+    echo "<script>alert('✅ Cập nhật phiếu mượn thành công!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
+  } else {
+    echo "<script>alert('❌ Cập nhật thất bại!');</script>";
+  }
+}
+
+// Lấy danh sách người dùng và sách
+$nguoidung = mysqli_query($ketnoi, "SELECT * FROM nguoidung");
+$sach = mysqli_query($ketnoi, "SELECT * FROM sach");
 ?>
 
-<div class="card">
-  <h3>✏️ Sửa thông tin mượn</h3>
-  <form method="POST">
-    <label>Người mượn:</label>
-    <select name="manguoidung" required>
-      <?php while($r = mysqli_fetch_assoc($nguoidung)): ?>
-        <option value="<?= $r['idnguoidung'] ?>" <?= $data['manguoidung']==$r['idnguoidung']?'selected':'' ?>>
-          <?= htmlspecialchars($r['hoten']) ?>
-        </option>
-      <?php endwhile; ?>
-    </select>
-
-    <label>Sách:</label>
-    <select name="masach" required>
-      <?php while($r = mysqli_fetch_assoc($sach)): ?>
-        <option value="<?= $r['masach'] ?>" <?= $data['masach']==$r['masach']?'selected':'' ?>>
-          <?= htmlspecialchars($r['tensach']) ?>
-        </option>
-      <?php endwhile; ?>
-    </select>
-
-    <label>Ngày mượn:</label>
-    <input type="date" name="ngaymuon" value="<?= $data['ngaymuon'] ?>" required>
-
-    <label>Hạn trả:</label>
-    <input type="date" name="hantra" value="<?= $data['hantra'] ?>" required>
-
-    <div style="margin-top:15px;">
-      <button type="submit" class="btn btn-edit">💾 Lưu thay đổi</button>
-      <a href="index.php?page_layout=danhsachmuonsach" class="btn btn-cancel">🔙 Quay lại</a>
+<div class="container mt-4">
+  <div class="card shadow border-0">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0"><i class="bx bx-edit"></i> Sửa phiếu mượn</h5>
     </div>
-  </form>
+
+    <div class="card-body">
+      <form method="POST">
+        <div class="mb-3">
+          <label class="form-label">Người mượn</label>
+          <select name="idnguoidung" class="form-select" required>
+            <option value="">-- Chọn người mượn --</option>
+            <?php while ($row = mysqli_fetch_assoc($nguoidung)) { ?>
+              <option value="<?= $row['idnguoidung'] ?>" <?= $row['idnguoidung'] == $muon['idnguoidung'] ? 'selected' : '' ?>>
+                <?= $row['hoten'] ?>
+              </option>
+            <?php } ?>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Sách</label>
+          <select name="idsach" class="form-select" required>
+            <option value="">-- Chọn sách --</option>
+            <?php while ($row = mysqli_fetch_assoc($sach)) { ?>
+              <option value="<?= $row['idsach'] ?>" <?= $row['idsach'] == $muon['idsach'] ? 'selected' : '' ?>>
+                <?= $row['tensach'] ?>
+              </option>
+            <?php } ?>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Ngày mượn</label>
+            <input type="date" name="ngaymuon" class="form-control" value="<?= $muon['ngaymuon'] ?>" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Hạn trả</label>
+            <input type="date" name="hantra" class="form-control" value="<?= $muon['hantra'] ?>" required>
+          </div>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Ngày trả thực tế</label>
+            <input type="date" name="ngaytra_thucte" class="form-control" value="<?= $muon['ngaytra_thucte'] ?>">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="index.php?page_layout=danhsachmuonsach" class="btn btn-secondary"><i class="bx bx-arrow-back"></i> Trở lại</a>
+          <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Lưu thay đổi</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>

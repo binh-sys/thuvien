@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   } else {
     // Kiểm tra email tồn tại
-    $stmt = mysqli_prepare($ketnoi, "SELECT manguoidung FROM nguoidung WHERE email = ?");
+    $stmt = mysqli_prepare($ketnoi, "SELECT idnguoidung FROM nguoidung WHERE email = ?");
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);

@@ -1,68 +1,135 @@
 <?php
-if (!isset($ketnoi)) require_once('ketnoi.php');
-function h($s){ return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
+require_once('ketnoi.php');
 
-$search = isset($_GET['q']) ? trim($_GET['q']) : '';
-$where = '';
-if ($search !== '') {
-  $s = mysqli_real_escape_string($ketnoi, $search);
-  $where = "WHERE n.hoten LIKE '%$s%' OR s.tensach LIKE '%$s%'";
-}
-
-$sql = "SELECT y.id, n.hoten AS nguoidung, s.tensach AS sach, y.ngaythem
+// Lấy danh sách yêu thích (JOIN người dùng + sách)
+$sql = "SELECT y.id, n.hoten, s.tensach, s.hinhanhsach, y.ngaythem
         FROM yeuthich y
-        JOIN nguoidung n ON y.manguoidung = n.idnguoidung
-        JOIN sach s ON y.masach = s.masach
-        $where
+        LEFT JOIN nguoidung n ON y.idnguoidung = n.idnguoidung
+        LEFT JOIN sach s ON y.idsach = s.idsach
         ORDER BY y.ngaythem DESC";
-$res = mysqli_query($ketnoi, $sql);
+$result = mysqli_query($ketnoi, $sql);
 ?>
-<div class="card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div style="font-weight:700;font-size:16px">Danh Sách Yêu Thích</div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="favSearch" placeholder="Tìm người dùng hoặc sách..." 
-             style="padding:8px 12px;border-radius:10px;border:1px solid #e6eef6">
-      <a href="index.php?page_layout=them_yeuthich" class="btn btn-edit">➕ Thêm</a>
-    </div>
-  </div>
 
-  <div class="table-wrap">
-    <table class="app-table">
-      <thead>
-        <tr>
-          <th>STT</th>
-          <th>Người dùng</th>
-          <th>Sách</th>
-          <th>Ngày thêm</th>
-          <th style="text-align:right">Hành động</th>
-        </tr>
-      </thead>
-      <tbody id="favBody">
-        <?php if ($res && mysqli_num_rows($res) > 0): $i=1; while($r=mysqli_fetch_assoc($res)): ?>
-          <tr data-name="<?php echo h($r['nguoidung'].' '.$r['sach']); ?>">
-            <td><?php echo $i++; ?></td>
-            <td><?php echo h($r['nguoidung']); ?></td>
-            <td><?php echo h($r['sach']); ?></td>
-            <td><?php echo h($r['ngaythem']); ?></td>
-            <td style="text-align:right">
-              <a href="index.php?page_layout=sua_yeuthich&id=<?php echo urlencode($r['id']); ?>" class="btn btn-edit">✏️ Sửa</a>
-              <a href="index.php?page_layout=xoa_yeuthich&id=<?php echo urlencode($r['id']); ?>" class="btn btn-delete" onclick="return confirm('Xóa khỏi danh sách yêu thích?');">🗑 Xóa</a>
-            </td>
-          </tr>
-        <?php endwhile; else: ?>
-          <tr><td colspan="5" style="text-align:center;padding:24px;color:#6b7280">Không có mục yêu thích nào.</td></tr>
-        <?php endif; ?>
-      </tbody>
-    </table>
+<div class="container mt-4">
+  <div class="card shadow border-0">
+    <div class="card-header text-white d-flex justify-content-between align-items-center"
+         style="background: linear-gradient(90deg, #4f46e5, #06b6d4);">
+      <h4 class="mb-0"><i class='bx bx-heart'></i> Danh sách Yêu Thích</h4>
+      <a href="index.php?page_layout=them_yeuthich" class="btn btn-light btn-sm fw-semibold shadow-sm">
+        <i class="bx bx-plus"></i> Thêm mới
+      </a>
+    </div>
+
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle text-center">
+          <thead class="table-primary align-middle">
+            <tr>
+              <th>STT</th>
+              <th>Ảnh bìa</th>
+              <th>Tên sách</th>
+              <th>Người dùng</th>
+              <th>Ngày thêm</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php 
+            $i = 1;
+            while ($row = mysqli_fetch_assoc($result)) { ?>
+              <tr>
+                <td><strong><?= $i++; ?></strong></td>
+                <td>
+                  <?php if (!empty($row['hinhanhsach'])): ?>
+                    <img src="../../feane/images/<?= htmlspecialchars($row['hinhanhsach']); ?>" 
+                         alt="Bìa sách" width="60" height="80" class="rounded shadow-sm"
+                         style="object-fit: cover;">
+                  <?php else: ?>
+                    <span class="text-muted fst-italic">Không có ảnh</span>
+                  <?php endif; ?>
+                </td>
+                <td class="fw-semibold"><?= htmlspecialchars($row['tensach'] ?? 'Không rõ'); ?></td>
+                <td><?= htmlspecialchars($row['hoten'] ?? 'Không rõ'); ?></td>
+                <td><?= date('d/m/Y', strtotime($row['ngaythem'])); ?></td>
+                <td>
+                  <div class="d-flex justify-content-center gap-2">
+                    <a href="index.php?page_layout=sua_yeuthich&id=<?= $row['id']; ?>" 
+                       class="btn btn-warning btn-sm text-dark shadow-sm" 
+                       data-bs-toggle="tooltip" title="Chỉnh sửa">
+                      <i class="bx bx-edit-alt"></i>
+                    </a>
+                    <button class="btn btn-danger btn-sm shadow-sm" 
+                            data-id="<?= $row['id']; ?>"
+                            data-bs-toggle="tooltip" title="Xóa"
+                            onclick="confirmDelete(this)">
+                      <i class="bx bx-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- Toast container -->
+<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
 <script>
-document.getElementById('favSearch').addEventListener('input', function(){
-  const v = this.value.toLowerCase();
-  document.querySelectorAll('#favBody tr').forEach(tr=>{
-    tr.style.display = (tr.getAttribute('data-name')||'').toLowerCase().indexOf(v) === -1 ? 'none' : '';
-  });
+document.addEventListener("DOMContentLoaded", function () {
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
 });
+
+// Xác nhận xóa + Toast
+function confirmDelete(btn) {
+  if (confirm("⚠️ Bạn có chắc muốn xóa mục này khỏi danh sách yêu thích không?")) {
+    const id = btn.getAttribute('data-id');
+    fetch(`xoa_yeuthich.php?id=${id}`)
+      .then(res => res.text())
+      .then(msg => {
+        showToast(msg.includes('✅') ? '✅ Xóa thành công!' : '❌ Không thể xóa!', 
+                  msg.includes('✅') ? 'success' : 'danger');
+        setTimeout(() => window.location.reload(), 1500);
+      });
+  }
+}
+
+// Hàm toast thông báo đẹp
+function showToast(message, type='info') {
+  const color = type==='success' ? 'bg-success' : (type==='danger' ? 'bg-danger' : 'bg-primary');
+  const toast = document.createElement('div');
+  toast.className = `toast align-items-center text-white border-0 ${color} show`;
+  toast.role = 'alert';
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body fw-semibold">${message}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>`;
+  document.getElementById('toastContainer').appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
 </script>
+
+<style>
+  .card {
+    border-radius: 15px;
+    overflow: hidden;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #eef4ff !important;
+    transition: 0.2s;
+  }
+  .btn-sm {
+    padding: 5px 8px !important;
+  }
+  .badge {
+    font-size: 0.85rem;
+  }
+  .table img {
+    border: 1px solid #ddd;
+  }
+</style>
