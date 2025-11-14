@@ -27,7 +27,7 @@ if (isset($_GET['idmuon'])) {
     $ok1 = mysqli_query($ketnoi, $sql_update_status);
 
     // 2️⃣ Tăng số lượng sách lên 1
-    $sql_update_soluong = "UPDATE sach SET Soluong = Soluong + 1 WHERE idsach = $idsach";
+    $sql_update_soluong = "UPDATE sach SET soluong = soluong + 1 WHERE idsach = $idsach";
     $ok2 = mysqli_query($ketnoi, $sql_update_soluong);
 
     if ($ok1 && $ok2) {

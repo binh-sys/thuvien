@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     } else {
                         $message_form = '<div class="alert alert-success">✅ Mượn sách thành công! Nhân viên thư viện sẽ xác nhận.</div>';
                     }
-                    // Optionally, you might want to decrement Soluong in sach table here.
+                    // Optionally, you might want to decrement soluong in sach table here.
                 } else {
                     if ($form_type === 'modal') {
                         $message_modal = '<div class="alert alert-danger">Có lỗi khi ghi dữ liệu. Vui lòng thử lại.</div>';

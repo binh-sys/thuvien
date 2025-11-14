@@ -35,6 +35,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </li>
                     <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
                         <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
+                    <li class="nav-item <?php if ($current_page == 'cart.php') echo 'active'; ?>">
+                        <a class="nav-link text-white px-3" href="cart.php">Mua sách</a>
+                    </li>
                     </li>
                 </ul>
             </div>

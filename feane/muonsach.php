@@ -15,7 +15,7 @@ if (isset($_GET['idsach'])) {
     $trangthai = 'dang_muon';
 
     // ✅ 1. Kiểm tra xem còn sách không
-    if ($sach['Soluong'] <= 0) {
+    if ($sach['soluong'] <= 0) {
       echo "<script>
               alert('❌ Sách này hiện đã hết! Không thể mượn thêm.');
               window.location.href='chitietsach.php?idsach=$idsach';
@@ -41,7 +41,7 @@ if (isset($_GET['idsach'])) {
 
     if ($result_muon) {
       // ✅ 4. Giảm số lượng sách đi 1
-      $sql_update = "UPDATE sach SET Soluong = Soluong - 1 WHERE idsach = $idsach";
+      $sql_update = "UPDATE sach SET soluong = soluong - 1 WHERE idsach = $idsach";
       mysqli_query($ketnoi, $sql_update);
 
       echo "<script>
@@ -87,7 +87,7 @@ if (isset($_GET['idsach'])) {
       <h3 class="text-center fw-bold mb-3"><?php echo htmlspecialchars($sach['tensach']); ?></h3>
       <p class="text-center text-muted mb-4">
         <b>Giá:</b> <?php echo number_format($sach['dongia']); ?> VNĐ &nbsp; | &nbsp;
-        <b>Còn lại:</b> <?php echo $sach['Soluong']; ?> cuốn
+        <b>Còn lại:</b> <?php echo $sach['soluong']; ?> cuốn
       </p>
 
       <form method="POST" class="px-3">

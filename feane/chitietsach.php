@@ -65,7 +65,7 @@ if (isset($_GET['idsach'])) {
             <div class="book-meta mb-3">
               <p><strong>📚 Thể loại:</strong> <?php echo htmlspecialchars($sach['tenloaisach']); ?></p>
               <p><strong>✍️ Tác giả:</strong> <?php echo htmlspecialchars($sach['tentacgia']); ?></p>
-              <p><strong>📦 Số lượng còn:</strong> <?php echo htmlspecialchars($sach['Soluong']); ?> cuốn</p>
+              <p><strong>📦 Số lượng còn:</strong> <?php echo htmlspecialchars($sach['soluong']); ?> cuốn</p>
             </div>
 
             <?php if (!empty($sach['dongia'])): ?>

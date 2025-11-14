@@ -294,16 +294,44 @@ require_once('ketnoi.php');
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
     <ul class="nav flex-column">
-      <li><a href="index.php" class="nav-link active"><i class='bx bx-home'></i> <span>Trang chủ</span></a></li>
+      <li><a href="index.php" class="nav-link active">
+          <i class='bx bx-home'></i> <span>Trang chủ</span>
+        </a></li>
+
       <div class="nav-category">Quản lý</div>
-      <li><a href="index.php?page_layout=danhsachloaisach" class="nav-link"><i class='bx bx-category'></i><span>Thể loại</span></a></li>
-      <li><a href="index.php?page_layout=danhsachsach" class="nav-link"><i class='bx bx-book'></i><span>Sách</span></a></li>
-      <li><a href="index.php?page_layout=danhsachmuonsach" class="nav-link"><i class='bx bx-bookmark-alt'></i><span>Mượn sách</span></a></li>
-      <li><a href="index.php?page_layout=danhsachtacgia" class="nav-link"><i class='bx bx-user-voice'></i><span>Tác giả</span></a></li>
-      <li><a href="index.php?page_layout=danhsachnguoidung" class="nav-link"><i class='bx bx-group'></i><span>Người dùng</span></a></li>
-      <li><a href="index.php?page_layout=danhsachyeuthich" class="nav-link"><i class='bx bx-heart'></i><span>Yêu thích</span></a></li>
+
+      <li><a href="index.php?page_layout=danhsachloaisach" class="nav-link">
+          <i class='bx bx-category'></i><span>Thể loại</span>
+        </a></li>
+
+      <li><a href="index.php?page_layout=danhsachsach" class="nav-link">
+          <i class='bx bx-book'></i><span>Sách</span>
+        </a></li>
+
+      <li><a href="index.php?page_layout=danhsachmuonsach" class="nav-link">
+          <i class='bx bx-bookmark-alt'></i><span>Mượn sách</span>
+        </a></li>
+
+      <!-- ⭐ Thêm mục Đơn hàng tại đây -->
+      <li><a href="index.php?page_layout=danhsachdonhang" class="nav-link">
+          <i class='bx bx-cart'></i><span>Đơn hàng</span>
+        </a></li>
+      <!-- ⭐ Kết thúc mục Đơn hàng -->
+
+      <li><a href="index.php?page_layout=danhsachtacgia" class="nav-link">
+          <i class='bx bx-user-voice'></i><span>Tác giả</span>
+        </a></li>
+
+      <li><a href="index.php?page_layout=danhsachnguoidung" class="nav-link">
+          <i class='bx bx-group'></i><span>Người dùng</span>
+        </a></li>
+
+      <li><a href="index.php?page_layout=danhsachyeuthich" class="nav-link">
+          <i class='bx bx-heart'></i><span>Yêu thích</span>
+        </a></li>
     </ul>
   </nav>
+
 
   <!-- Content -->
   <div class="content-area">
@@ -411,6 +439,31 @@ require_once('ketnoi.php');
             case "xoa_yeuthich":
               require_once 'xoa_yeuthich.php';
               break;
+            // --- ĐƠN HÀNG ---
+            case "danhsachdonhang":
+              require_once 'donhang.php';
+              break;
+            case "them_donhang":
+              require_once 'them_donhang.php';
+              break;
+            case "sua_donhang":
+              require_once 'sua_donhang.php';
+              break;
+            case "xoa_donhang":
+              require_once 'xoa_donhang.php';
+              break;
+            case "xem_donhang":
+              require_once 'xem_donhang.php';
+              break;
+            case "add_sanpham":
+              require_once 'add_sanpham.php';
+              break;
+            case "xoa_sanpham":
+              require_once 'xoa_sanpham.php';
+              break;
+            case "sua_sanpham":
+              require_once 'sua_sanpham.php';
+              break;
 
 
             // --- MẶC ĐỊNH ---
@@ -455,49 +508,59 @@ require_once('ketnoi.php');
     })();
   </script>
   <!-- ==== TOAST THÔNG BÁO CHUNG ==== -->
-<style>
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  min-width: 260px;
-  padding: 12px 18px;
-  border-radius: 8px;
-  color: #fff;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  opacity: 0;
-  transform: translateY(-20px);
-  transition: all 0.4s ease;
-  z-index: 9999;
-}
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-.toast.success { background: linear-gradient(135deg,#4CAF50,#2E7D32); }
-.toast.danger { background: linear-gradient(135deg,#f44336,#b71c1c); }
-.toast.warning { background: linear-gradient(135deg,#FF9800,#E65100); }
-</style>
+  <style>
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      min-width: 260px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.4s ease;
+      z-index: 9999;
+    }
 
-<script>
-function showToast(message, type = 'success') {
-  // Tạo khối toast
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-  document.body.appendChild(toast);
-  // Hiện lên mượt
-  setTimeout(() => toast.classList.add('show'), 100);
-  // Ẩn sau 3s
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
-}
-</script>
-<!-- ==== KẾT THÚC TOAST ==== -->
+    .toast.success {
+      background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    }
+
+    .toast.danger {
+      background: linear-gradient(135deg, #f44336, #b71c1c);
+    }
+
+    .toast.warning {
+      background: linear-gradient(135deg, #FF9800, #E65100);
+    }
+  </style>
+
+  <script>
+    function showToast(message, type = 'success') {
+      // Tạo khối toast
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+
+      document.body.appendChild(toast);
+      // Hiện lên mượt
+      setTimeout(() => toast.classList.add('show'), 100);
+      // Ẩn sau 3s
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+  </script>
+  <!-- ==== KẾT THÚC TOAST ==== -->
 
 </body>
 
