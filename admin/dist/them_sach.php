@@ -5,6 +5,8 @@ require_once('ketnoi.php');
 $tacgia = mysqli_query($ketnoi, "SELECT * FROM tacgia ORDER BY tentacgia ASC");
 $loaisach = mysqli_query($ketnoi, "SELECT * FROM loaisach ORDER BY tenloaisach ASC");
 
+$msg = $type = "";
+
 if (isset($_POST['add_sach'])) {
   $tensach = mysqli_real_escape_string($ketnoi, $_POST['tensach']);
   $soluong = (int)$_POST['soluong'];
@@ -13,7 +15,7 @@ if (isset($_POST['add_sach'])) {
   $idtacgia = (int)$_POST['idtacgia'];
   $idloaisach = (int)$_POST['idloaisach'];
 
-  // upload ảnh
+  // Upload ảnh
   $hinhanh = '';
   if (!empty($_FILES['hinhanhsach']['name'])) {
     $file = $_FILES['hinhanhsach'];
@@ -22,24 +24,25 @@ if (isset($_POST['add_sach'])) {
     $hinhanh = $filename;
   }
 
-  $sql = "INSERT INTO sach (tensach, soluong, dongia, hinhanhsach, mota, idtacgia, idloaisach, ngaynhap) 
+  $sql = "INSERT INTO sach (tensach, soluong, dongia, hinhanhsach, mota, idtacgia, idloaisach, ngaynhap)
           VALUES ('$tensach', $soluong, $dongia, '$hinhanh', '$mota', $idtacgia, $idloaisach, NOW())";
+  
   if (mysqli_query($ketnoi, $sql)) {
     $msg = "✅ Thêm sách thành công!";
-    echo "<script>showToast('$msg','success'); setTimeout(()=>window.location='index.php?page_layout=danhsachsach',1500);</script>";
+    $type = "success";
   } else {
     $msg = "❌ Lỗi khi thêm sách!";
-    echo "<script>showToast('$msg','danger');</script>";
+    $type = "danger";
   }
 }
 ?>
 
 <div class="container mt-4">
-  <div class="card shadow-sm border-0">
-    <div class="card-header bg-primary text-white">
-      <h4 class="mb-0"><i class="bx bx-plus"></i> Thêm sách mới</h4>
+  <div class="card shadow border-0">
+    <div class="card-header text-white" style="background: linear-gradient(90deg, #06b6d4, #67e8f9);">
+      <h4 class="mb-0 fw-bold"><i class="bx bx-plus"></i> Thêm Sách Mới</h4>
     </div>
-    <div class="card-body">
+    <div class="card-body bg-light">
       <form method="POST" enctype="multipart/form-data">
         <div class="row mb-3">
           <div class="col-md-6">
@@ -88,10 +91,51 @@ if (isset($_POST['add_sach'])) {
         </div>
 
         <div class="d-flex justify-content-between">
-          <button type="submit" name="add_sach" class="btn btn-success px-4"><i class="bx bx-save"></i> Lưu</button>
-          <a href="index.php?page_layout=danhsachsach" class="btn btn-secondary px-4"><i class="bx bx-arrow-back"></i> Quay lại</a>
+          <button type="submit" name="add_sach" class="btn btn-success px-4 shadow-sm">
+            <i class="bx bx-save"></i> Lưu
+          </button>
+          <a href="index.php?page_layout=danhsachsach" class="btn btn-secondary px-4 shadow-sm">
+            <i class="bx bx-arrow-back"></i> Quay lại
+          </a>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<!-- Toast -->
+<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<script>
+function showToast(message, type = 'info') {
+  const color = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-primary');
+  const toast = document.createElement('div');
+  toast.className = `toast align-items-center text-white border-0 ${color} show`;
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body fw-semibold">${message}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>`;
+  document.getElementById('toastContainer').appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// Nếu có thông báo từ PHP
+<?php if (!empty($msg)) : ?>
+  document.addEventListener("DOMContentLoaded", () => {
+    showToast("<?= $msg ?>", "<?= $type ?>");
+    <?php if ($type === 'success') : ?>
+      setTimeout(() => window.location = "index.php?page_layout=danhsachsach", 1500);
+    <?php endif; ?>
+  });
+<?php endif; ?>
+</script>
+
+<style>
+  .card {
+    border-radius: 15px;
+  }
+  .card-header {
+    border-bottom: none;
+  }
+</style>

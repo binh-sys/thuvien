@@ -9,21 +9,21 @@ $sql = "SELECT s.*, l.tenloaisach, t.tentacgia
 $result = mysqli_query($ketnoi, $sql);
 ?>
 
-<!-- ===== DANH SÁCH SÁCH ===== -->
+<!-- ========== DANH SÁCH SÁCH ========== -->
 <div class="container mt-4">
-  <div class="card shadow border-0">
-    <div class="card-header bg-gradient text-white d-flex justify-content-between align-items-center" 
-         style="background: linear-gradient(90deg, #1e3a8a, #3b82f6);">
-      <h4 class="mb-0"><i class="bx bx-book"></i> Quản lý Sách</h4>
-      <a href="index.php?page_layout=them_sach" class="btn btn-light btn-sm shadow-sm fw-semibold">
+  <div class="card shadow border-0" style="border-radius: 16px;">
+    <div class="card-header text-white d-flex justify-content-between align-items-center"
+         style="background: linear-gradient(90deg, #06b6d4, #67e8f9); color: #fff;">
+      <h4 class="mb-0 fw-bold"><i class="bx bx-book"></i> Quản lý Sách</h4>
+      <a href="index.php?page_layout=them_sach" class="btn btn-light btn-sm fw-semibold shadow-sm rounded-pill px-3">
         <i class="bx bx-plus-circle"></i> Thêm Sách
       </a>
     </div>
 
-    <div class="card-body">
+    <div class="card-body bg-light">
       <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle">
-          <thead class="table-primary text-center align-middle">
+        <table class="table table-hover table-bordered align-middle shadow-sm bg-white">
+          <thead class="text-center align-middle" style="background-color: #e0f7fa;">
             <tr>
               <th>STT</th>
               <th>Ảnh bìa</th>
@@ -54,21 +54,18 @@ $result = mysqli_query($ketnoi, $sql);
                 </td>
                 <td class="fw-semibold text-start"><?= htmlspecialchars($row['tensach']); ?></td>
                 <td><?= htmlspecialchars($row['tentacgia'] ?? 'Không rõ'); ?></td>
-                <td><span class="badge bg-info text-dark"><?= htmlspecialchars($row['tenloaisach'] ?? 'Không rõ'); ?></span></td>
+                <td><span class="badge bg-info-subtle text-dark px-3 py-2 shadow-sm"><?= htmlspecialchars($row['tenloaisach'] ?? 'Không rõ'); ?></span></td>
                 <td><?= $row['soluong']; ?></td>
                 <td class="text-success fw-bold"><?= number_format($row['dongia']); ?>₫</td>
                 <td><?= date('d/m/Y', strtotime($row['ngaynhap'])); ?></td>
                 <td>
                   <div class="d-flex justify-content-center gap-2">
-                    <!-- Nút Sửa -->
                     <a href="index.php?page_layout=sua_sach&idsach=<?= $row['idsach']; ?>" 
-                       class="btn btn-warning btn-sm text-dark shadow-sm"
+                       class="btn btn-warning btn-sm shadow-sm text-dark rounded-pill px-2"
                        data-bs-toggle="tooltip" title="Chỉnh sửa">
                       <i class="bx bx-edit-alt"></i>
                     </a>
-
-                    <!-- Nút Xóa -->
-                    <button class="btn btn-danger btn-sm shadow-sm"
+                    <button class="btn btn-danger btn-sm shadow-sm rounded-pill px-2"
                             data-id="<?= $row['idsach']; ?>"
                             data-bs-toggle="tooltip" title="Xóa sách"
                             onclick="confirmDelete(this)">
@@ -85,34 +82,37 @@ $result = mysqli_query($ketnoi, $sql);
   </div>
 </div>
 
-<!-- Toast thông báo -->
+<!-- Toast -->
 <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-<!-- Script xử lý Tooltip + Toast + Xóa -->
+<!-- JS xử lý Tooltip + Toast + Xóa -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  // Tooltip
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
 });
 
-// Xác nhận xóa
 function confirmDelete(btn) {
   if (confirm("⚠️ Bạn có chắc muốn xóa sách này không?")) {
-    const id = btn.getAttribute('data-id');
+    const id = btn.dataset.id;
     fetch(`xoa_sach.php?idsach=${id}`)
       .then(res => res.text())
-      .then(msg => showToast(msg.includes('✅') ? '✅ Xóa thành công!' : '❌ Không thể xóa!', msg.includes('✅') ? 'success' : 'danger'))
-      .then(() => setTimeout(() => window.location.reload(), 1500));
+      .then(msg => {
+        const ok = msg.includes('✅');
+        showToast(ok ? '✅ Xóa thành công!' : '❌ Không thể xóa!', ok ? 'success' : 'danger');
+        setTimeout(() => window.location.reload(), 1500);
+      });
   }
 }
 
-// Hàm toast thông báo đẹp
 function showToast(message, type = 'info') {
-  const color = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-primary');
+  const color = {
+    success: 'bg-success',
+    danger: 'bg-danger',
+    info: 'bg-info'
+  }[type] || 'bg-primary';
+  
   const toast = document.createElement('div');
   toast.className = `toast align-items-center text-white border-0 ${color} show`;
-  toast.role = 'alert';
   toast.innerHTML = `
     <div class="d-flex">
       <div class="toast-body fw-semibold">${message}</div>
@@ -123,20 +123,16 @@ function showToast(message, type = 'info') {
 }
 </script>
 
-<!-- CSS tùy chỉnh -->
+<!-- CSS -->
 <style>
-  .card {
-    border-radius: 15px;
-    overflow: hidden;
-  }
   .table-hover tbody tr:hover {
-    background-color: #eef4ff !important;
-    transition: 0.2s;
+    background-color: #f0fdfa !important;
+    transition: all 0.25s ease;
   }
-  .btn-sm {
-    padding: 5px 8px !important;
+  .card-header {
+    border-bottom: none;
   }
-  .badge {
-    font-size: 0.85rem;
+  .btn-sm i {
+    font-size: 1rem;
   }
 </style>

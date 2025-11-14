@@ -1,28 +1,12 @@
 <?php
-// xacnhan_tra.php
-if (!isset($ketnoi)) require_once('ketnoi.php');
-function h($s){ return htmlspecialchars($s, ENT_QUOTES, 'UTF-8'); }
+require_once('ketnoi.php');
 
-// Kiểm tra có mã mượn không
-if (!isset($_GET['idmuon'])) {
-  echo "<script>alert('Thiếu mã mượn!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
-  exit;
+if (isset($_POST['idmuon'])) {
+  $idmuon = intval($_POST['idmuon']);
+  $sql = "UPDATE muonsach SET ngaytra_thucte = NOW() WHERE idmuon = $idmuon";
+  mysqli_query($ketnoi, $sql);
 }
 
-$idmuon = mysqli_real_escape_string($ketnoi, $_GET['idmuon']);
-
-// Kiểm tra bản ghi có tồn tại không
-$check = mysqli_query($ketnoi, "SELECT * FROM muonsach WHERE idmuon='$idmuon'");
-if (!$check || mysqli_num_rows($check) == 0) {
-  echo "<script>alert('Không tìm thấy bản ghi mượn!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
-  exit;
-}
-
-// Cập nhật trạng thái sang 'da_tra'
-$sql = "UPDATE muonsach SET trangthai='da_tra' WHERE idmuon='$idmuon'";
-if (mysqli_query($ketnoi, $sql)) {
-  echo "<script>alert('✅ Đã xác nhận trả sách thành công!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
-} else {
-  echo "<script>alert('❌ Lỗi khi cập nhật dữ liệu!'); window.location='index.php?page_layout=danhsachmuonsach';</script>";
-}
+header('Location: index.php?page_layout=danhsachmuonsach');
+exit;
 ?>

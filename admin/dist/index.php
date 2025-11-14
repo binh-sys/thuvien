@@ -9,7 +9,7 @@ require_once('ketnoi.php');
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Thư Viện Trường Học - Ultra UI</title>
+  <title>Thư Viện Trường Học</title>
 
   <!-- Bootstrap & Boxicons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -454,6 +454,51 @@ require_once('ketnoi.php');
       });
     })();
   </script>
+  <!-- ==== TOAST THÔNG BÁO CHUNG ==== -->
+<style>
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 260px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.4s ease;
+  z-index: 9999;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.success { background: linear-gradient(135deg,#4CAF50,#2E7D32); }
+.toast.danger { background: linear-gradient(135deg,#f44336,#b71c1c); }
+.toast.warning { background: linear-gradient(135deg,#FF9800,#E65100); }
+</style>
+
+<script>
+function showToast(message, type = 'success') {
+  // Tạo khối toast
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  document.body.appendChild(toast);
+  // Hiện lên mượt
+  setTimeout(() => toast.classList.add('show'), 100);
+  // Ẩn sau 3s
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+</script>
+<!-- ==== KẾT THÚC TOAST ==== -->
+
 </body>
 
 </html>
