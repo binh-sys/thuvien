@@ -11,17 +11,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($email === '' || $matkhau === '') {
     $message = '<div class="alert alert-danger text-center">Vui lòng nhập đầy đủ Email và Mật khẩu.</div>';
   } else {
-    $stmt = mysqli_prepare($ketnoi, "SELECT idnguoidung, hoten, matkhau, vaitro FROM nguoidung WHERE email = ?");
+
+    // Kiểm tra lại tên cột mật khẩu trong DB của bạn
+    $sql = "SELECT idnguoidung, hoten, matkhau, vaitro FROM nguoidung WHERE email = ?";
+
+    $stmt = mysqli_prepare($ketnoi, $sql);
     mysqli_stmt_bind_param($stmt, 's', $email);
     mysqli_stmt_execute($stmt);
+
+    // Lưu kết quả vào bộ nhớ
     mysqli_stmt_store_result($stmt);
 
+    // Nếu có 1 dòng khớp email
     if (mysqli_stmt_num_rows($stmt) > 0) {
+
       mysqli_stmt_bind_result($stmt, $idnguoidung, $hoten, $hash, $vaitro);
       mysqli_stmt_fetch($stmt);
 
+      // Debug nếu hash bị NULL
+      if ($hash === null) {
+        die("<b>Lỗi:</b> Trường mật khẩu trong DB không phải tên 'matkhau'.<br>Hãy gửi cấu trúc bảng để mình sửa chính xác.");
+      }
+
+      // Kiểm tra mật khẩu
       if (password_verify($matkhau, $hash)) {
-        // Lưu session
+
         $_SESSION['idnguoidung'] = $idnguoidung;
         $_SESSION['hoten'] = $hoten;
         $_SESSION['email'] = $email;
@@ -35,14 +49,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       $message = '<div class="alert alert-danger text-center">Email không tồn tại trong hệ thống.</div>';
     }
+
     mysqli_stmt_close($stmt);
   }
 }
 
 mysqli_close($ketnoi);
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập - Thư viện CTECH</title>
@@ -53,6 +70,7 @@ mysqli_close($ketnoi);
   <link rel="stylesheet" href="css/dangnhap.css">
   <link href="css/footer.css" rel="stylesheet">
 </head>
+
 <body>
 
   <div class="login-container">
@@ -79,4 +97,5 @@ mysqli_close($ketnoi);
   <script src="js/jquery-3.4.1.min.js"></script>
   <script src="js/bootstrap.js"></script>
 </body>
+
 </html>

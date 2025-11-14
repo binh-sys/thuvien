@@ -65,7 +65,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
             <!-- SEARCH -->
             <div class="search-box">
-                <i class="fa fa-eye-slash search-icon"></i>
+                <i class="fa fa-search search-icon"></i>
                 <input type="text" id="header-search" class="search-input" placeholder="Tìm kiếm sách...">
                 <ul class="search-suggestions" id="search-suggestions"></ul>
             </div>
@@ -92,28 +92,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
     const searchSuggestions = document.querySelector("#search-suggestions");
     const searchIcon = document.querySelector(".search-icon");
 
-
-    // Hàm tạo hiệu ứng blink
-    function blinkIcon() {
-        searchIcon.classList.add("eye-blink");
-        setTimeout(() => {
-            searchIcon.classList.remove("eye-blink");
-        }, 200);
-    }
-
-
-    // ✅ 1. Click icon → mở search + đổi icon mắt mở + blink
+    // ✅ 1. Click icon → mở search 
     searchIcon.addEventListener("mouseenter", (e) => {
         e.stopPropagation();
-        blinkIcon();
-
         searchBox.classList.add("active");
         searchInput.focus();
-
-        searchIcon.classList.remove("fa-eye-slash");
-        searchIcon.classList.add("fa-eye");
     });
-
 
     // ✅ 2. Gợi ý realtime
     searchInput.addEventListener("input", () => {
@@ -132,13 +116,22 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     return;
                 }
 
+                const keywordLower = keyword.toLowerCase();
+
+                // Sắp xếp: bắt đầu bằng keyword → lên đầu
+                data.sort((a, b) => {
+                    const aStart = a.tensach.toLowerCase().startsWith(keywordLower) ? 0 : 1;
+                    const bStart = b.tensach.toLowerCase().startsWith(keywordLower) ? 0 : 1;
+                    return aStart - bStart;
+                });
+
                 searchSuggestions.innerHTML = data
                     .map(item => `
-                    <li data-id="${item.idsach}">
-                        <b>${item.tensach}</b><br>
-                        <small>${item.tentacgia}</small>
-                    </li>
-                `)
+            <li data-id="${item.idsach}">
+                <b>${item.tensach}</b><br>
+                <small>${item.tentacgia}</small>
+            </li>
+        `)
                     .join("");
 
                 searchSuggestions.style.display = "block";
@@ -177,17 +170,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
     });
 
 
-    // ✅ 5. Click ra ngoài → thu search-box + mắt chớp + đổi icon mắt nhắm
     document.addEventListener("click", (e) => {
         if (!searchBox.contains(e.target)) {
-
-            blinkIcon(); // CHỚP
-
             searchBox.classList.remove("active");
             searchSuggestions.style.display = "none";
-
-            searchIcon.classList.remove("fa-eye");
-            searchIcon.classList.add("fa-eye-slash");
         }
     });
 </script>
