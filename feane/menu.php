@@ -71,9 +71,9 @@ $books = mysqli_query($ketnoi, $sql);
 
   if ($keyword !== '') {
     $kw = mysqli_real_escape_string($ketnoi, $keyword);
-    $sql .= " AND (sach.tensach LIKE '%$kw%' 
-             OR tacgia.tentacgia LIKE '%$kw%' 
-             OR loaisach.tenloaisach LIKE '%$kw%')";
+    $sql .= " AND (sach.tensach COLLATE utf8mb4_vietnamese_ci LIKE '%$kw%' 
+             OR tacgia.tentacgia COLLATE utf8mb4_vietnamese_ci LIKE '%$kw%' 
+             OR loaisach.tenloaisach COLLATE utf8mb4_vietnamese_ci LIKE '%$kw%')";
   }
 
   if ($idloaisach > 0) {
@@ -102,32 +102,59 @@ $books = mysqli_query($ketnoi, $sql);
   $books = mysqli_query($ketnoi, $sql);
 
   ?>
-  
-  <!-- Danh Sách thể loại -->
-  <div class="container">
-    <ul class="filters_menu">
-      <li class="<?= ($idloaisach == 0 && !$new && !$featured) ? 'active' : ''; ?>">
-        <a href="menu.php" class="filter-link">Tất cả</a>
-      </li>
-      <li class="<?= ($new) ? 'active' : ''; ?>">
-        <a href="menu.php?new=1" class="filter-link">Sách mới về</a>
-      </li>
-      <li class="<?= ($featured) ? 'active' : ''; ?>">
-        <a href="menu.php?featured=1" class="filter-link">Sách nổi bật</a>
-      </li>
 
-      <?php mysqli_data_seek($loaisach, 0); ?>
-      <?php while ($row = mysqli_fetch_assoc($loaisach)) {
-        $active = ($idloaisach == $row['idloaisach']) ? 'active' : '';
-      ?>
-        <li class="<?= $active; ?>">
-          <a href="menu.php?idloaisach=<?= $row['idloaisach']; ?>" class="filter-link">
-            <?= htmlspecialchars($row['tenloaisach']); ?>
-          </a>
+  <!-- DANH SÁCH THỂ LOẠI -->
+  <div class="container">
+    <div class="category-scroll">
+      <ul class="filters_menu">
+
+        <!-- TẤT CẢ -->
+        <li class="<?= ($idloaisach == 0 && !$new && !$featured) ? 'active' : ''; ?>">
+          <a href="menu.php" class="filter-link">Tất cả</a>
         </li>
-      <?php } ?>
-    </ul>
+
+        <!-- SÁCH MỚI VỀ -->
+        <li class="<?= ($new) ? 'active' : ''; ?>">
+          <a href="menu.php?new=1" class="filter-link">Sách mới về</a>
+        </li>
+
+        <!-- SÁCH NỔI BẬT -->
+        <li class="<?= ($featured) ? 'active' : ''; ?>">
+          <a href="menu.php?featured=1" class="filter-link">Sách nổi bật</a>
+        </li>
+
+        <!-- CÁC THỂ LOẠI -->
+        <?php
+        $maxVisible = 4; // số thể loại hiển thị trực tiếp
+        $count = 0;
+        mysqli_data_seek($loaisach, 0); // reset con trỏ danh sách thể loại
+
+        while ($row = mysqli_fetch_assoc($loaisach)) {
+          $active = ($idloaisach == $row['idloaisach']) ? 'active' : '';
+
+          // Nếu số lượng chưa đạt maxVisible → hiển thị bình thường
+          if ($count < $maxVisible) {
+            echo '<li class="' . $active . '" style="white-space:nowrap;">
+                <a href="menu.php?idloaisach=' . $row['idloaisach'] . '" class="filter-link">'
+              . htmlspecialchars($row['tenloaisach']) .
+              '</a>
+              </li>';
+          } else {
+            // Các thể loại còn lại vẫn in ra nhưng nằm trong scroll
+            echo '<li class="' . $active . '" style="white-space:nowrap;">
+                <a href="menu.php?idloaisach=' . $row['idloaisach'] . '" class="filter-link">'
+              . htmlspecialchars($row['tenloaisach']) .
+              '</a>
+              </li>';
+          }
+          $count++;
+        }
+        ?>
+      </ul>
+    </div>
   </div>
+
+
 
   <!-- PHẦN DANH SÁCH SÁCH -->
   <section>
@@ -261,6 +288,37 @@ $books = mysqli_query($ketnoi, $sql);
   </script>
 
   <!-- JS -->
+  <script>
+    const scrollArea = document.querySelector('.category-scroll');
+    let isScrolling = false;
+    let scrollVelocity = 0;
+    scrollArea.addEventListener('wheel', function(e) {
+      if (e.deltaY === 0) return;
+      e.preventDefault();
+      const speed = 6;
+      scrollArea.scrollBy({
+        left: e.deltaY * speed,
+        behavior: 'smooth'
+      });
+    });
+
+    function momentumScroll() {
+      isScrolling = true;
+
+      // Cập nhật vị trí scroll
+      scrollArea.scrollLeft += scrollVelocity;
+
+      // Nếu tốc độ nhỏ → dừng
+      if (Math.abs(scrollVelocity) > 0) {
+        requestAnimationFrame(momentumScroll);
+      } else {
+        scrollVelocity = 0;
+        isScrolling = false;
+      }
+    }
+  </script>
+
+
   <script>
     const toggleBtn = document.getElementById("userToggle");
     const dropdown = document.getElementById("userDropdown");

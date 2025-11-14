@@ -22,15 +22,49 @@
   }
 }
 
+.category-scroll {
+  position: relative;
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  margin: 20px auto;
+  max-width: 90%;
+  background-color: #101010;
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px
+  );
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-radius: 25px;
+}
+
+.category-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.category-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 193, 7, 0.7);
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+.category-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: #ffc107;
+}
+.category-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
 /* MENU SÁCHHHHHHHHHHHHHHH */
 .filters_menu {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin: 40px auto;
-  padding: 0;
+  display: inline-flex; /* giữ 1 hàng duy nhất */
+  flex-wrap: nowrap; /* không xuống hàng */
+  gap: 10px;
+  padding: 0 10px;
+  margin: 2px auto; /* bỏ margin để không bị lệch */
   list-style: none;
+  white-space: nowrap; /* không xuống hàng */
+  justify-content: flex-start;
 }
 
 /* Nút mặc định */
@@ -38,7 +72,7 @@
   display: inline-block;
   background: linear-gradient(135deg, #ffa726, #ffca28);
   color: #222;
-  padding: 12px 36px;
+  padding: 8px 36px;
   border-radius: 50px;
   font-weight: 500;
   text-decoration: none;
@@ -73,9 +107,12 @@
 }
 
 /* Hiệu ứng mượt mà */
-.filters_menu li a,
-.filters_menu li.active a {
-  transition: all 0.25s ease-in-out;
+.filters_menu li a .filters_menu li.active a {
+  background: linear-gradient(135deg, #ffb300, #ff9800);
+  color: #000;
+  border: 2px solid #ffeb3b;
+  font-weight: 600;
+  transform: translateY(-1px);
 }
 
 /* === HỘP SÁCH TRONG SUỐT XUYÊN ẢNH NỀN === */

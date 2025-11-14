@@ -272,7 +272,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     <!-- =========================
-      <!-- =========================
    DANH SÁCH SÁCH YÊU THÍCH
 ========================= -->
     <section class="about_section layout_padding" style="background-color: #1e1f26;">
@@ -507,4 +506,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <scriptz src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
         </script>
 </body>
+
 </html>
