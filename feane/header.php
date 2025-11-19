@@ -1,3 +1,4 @@
+<!-- ==================== HEADER ==================== -->
 <?php
 if (session_status() === PHP_SESSION_NONE) session_start();
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -5,45 +6,32 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <header class="header_section <?php echo ($pageType === 'detail') ? 'header_detail' : ''; ?>">
     <div class="container">
-        <nav class="navbar navbar-expand-lg custom_nav-container align-items-center justify-content-between">
-            <!-- Logo -->
-            <a class="navbar-brand d-flex align-items-center" href="index.php">
-                <img src="images/Book.png" alt="Logo Thư viện" style="height: 48px; margin-right:10px;">
-                <span style="font-weight: bold; font-size: 20px; color: #fff;">
-                    THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
-                </span>
-            </a>
+        <nav class="navbar navbar-expand-lg custom_nav-container">
 
-            <!-- Menu toggle cho mobile -->
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
-                style="border: none; outline: none;">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <!-- LEFT: Menu icon + Logo -->
+            <div class="header-left d-flex align-items-center">
+                <!-- Sidebar toggle -->
+                <i id="sidebarToggle" class="fa fa-bars sidebar-toggle"></i>
 
-            <!-- Menu chính -->
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
-                <ul class="navbar-nav text-uppercase fw-bold">
-                    <li class="nav-item <?php if ($current_page == 'index.php') echo 'active'; ?>">
-                        <a class="nav-link text-white px-3" href="index.php">Trang chủ</a>
-                    </li>
-                    <li class="nav-item <?php if ($current_page == 'menu.php') echo 'active'; ?>">
-                        <a class="nav-link text-white px-3" href="menu.php">Kho sách</a>
-                    </li>
-                    <li class="nav-item <?php if ($current_page == 'about.php') echo 'active'; ?>">
-                        <a class="nav-link text-white px-3" href="about.php">Giới thiệu</a>
-                    </li>
-                    <li class="nav-item <?php if ($current_page == 'book.php') echo 'active'; ?>">
-                        <a class="nav-link text-white px-3" href="book.php">Mượn sách</a>
-                    <li class="nav-item <?php if ($current_page == 'cart.php') echo 'active'; ?>">
-                        <a class="nav-link text-white px-3" href="cart.php">Mua sách</a>
-                    </li>
-                    </li>
-                </ul>
+                <a class="navbar-brand d-flex align-items-center" href="index.php">
+                    <img src="images/Book.png" alt="Logo" style="height: 48px; margin-right:10px;">
+                    <span style="font-weight: bold; font-size: 20px; color: #fff;">
+                        THƯ VIỆN<br><small style="font-size:14px; color: #ffc107;">CTECH</small>
+                    </span>
+                </a>
             </div>
 
-            <!-- Góc phải user -->
-            <div class="user_option d-flex align-items-center" style="gap: 12px;">
+            <!-- CENTER: Search -->
+            <div class="header-center">
+                <div class="search-box">
+                    <i class="fa fa-search search-icon"></i>
+                    <input type="text" id="header-search" class="search-input" placeholder="Tìm kiếm sách...">
+                    <ul class="search-suggestions" id="search-suggestions"></ul>
+                </div>
+            </div>
+
+            <!-- RIGHT: User -->
+            <div class="header-right user_option">
                 <?php if (isset($_SESSION['hoten'])): ?>
                     <div class="user-dropdown">
                         <div class="user-dropdown-trigger">
@@ -58,21 +46,52 @@ $current_page = basename($_SERVER['PHP_SELF']);
                         </div>
                     </div>
                 <?php else: ?>
-                    <a href="dangnhap.php" class="btn btn-outline-warning fw-bold" style="border-radius:25px; padding:6px 20px;">
+                    <a href="dangnhap.php" class="btn btn-outline-warning fw-bold"
+                        style="border-radius:25px; padding:6px 20px;">
                         <i class="fa fa-user mr-2"></i> Đăng nhập
                     </a>
                 <?php endif; ?>
-            </div>
-            <!-- SEARCH -->
-            <div class="search-box">
-                <i class="fa fa-search search-icon"></i>
-                <input type="text" id="header-search" class="search-input" placeholder="Tìm kiếm sách...">
-                <ul class="search-suggestions" id="search-suggestions"></ul>
             </div>
 
         </nav>
     </div>
 </header>
+
+<!-- ==================== SIDEBAR ==================== -->
+<!-- SIDEBAR YOUTUBE STYLE -->
+<div id="sidebar" class="yt-sidebar">
+    <div class="yt-section">
+        <a href="index.php" class="yt-item">
+            <i class="fa fa-home"></i> Trang chủ
+        </a>
+        <a href="menu.php" class="yt-item">
+            <i class="fa fa-book"></i> Kho sách
+        </a>
+        <a href="about.php" class="yt-item">
+            <i class="fa fa-info-circle"></i> Giới thiệu
+        </a>
+    </div>
+
+    <div class="yt-section">
+        <a href="book.php" class="yt-item">
+            <i class="fa fa-archive"></i> Mượn sách
+        </a>
+    </div>
+
+    <div class="yt-section">
+        <a href="yeuthich.php" class="yt-item">
+            <i class="fa fa-heart"></i> Yêu thích
+        </a>
+        <a href="lichsu.php" class="yt-item">
+            <i class="fa fa-history"></i> Lịch sử
+        </a>
+    </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="sidebarOverlay" class="yt-overlay"></div>
+
+
 
 <script>
     window.addEventListener("scroll", function() {
@@ -175,5 +194,27 @@ $current_page = basename($_SERVER['PHP_SELF']);
             searchBox.classList.remove("active");
             searchSuggestions.style.display = "none";
         }
+    });
+</script>
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    const toggleBtn = document.getElementById("sidebarToggle");
+
+    toggleBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("active");
+        overlay.classList.toggle("active");
+
+        // đổi icon bars <-> X
+        toggleBtn.classList.toggle("fa-bars");
+        toggleBtn.classList.toggle("fa-times");
+    });
+
+    overlay.addEventListener("click", () => {
+        sidebar.classList.remove("active");
+        overlay.classList.remove("active");
+
+        toggleBtn.classList.add("fa-bars");
+        toggleBtn.classList.remove("fa-times");
     });
 </script>

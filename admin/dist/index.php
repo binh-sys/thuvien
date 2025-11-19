@@ -311,13 +311,6 @@ require_once('ketnoi.php');
       <li><a href="index.php?page_layout=danhsachmuonsach" class="nav-link">
           <i class='bx bx-bookmark-alt'></i><span>Mượn sách</span>
         </a></li>
-
-      <!-- ⭐ Thêm mục Đơn hàng tại đây -->
-      <li><a href="index.php?page_layout=danhsachdonhang" class="nav-link">
-          <i class='bx bx-cart'></i><span>Đơn hàng</span>
-        </a></li>
-      <!-- ⭐ Kết thúc mục Đơn hàng -->
-
       <li><a href="index.php?page_layout=danhsachtacgia" class="nav-link">
           <i class='bx bx-user-voice'></i><span>Tác giả</span>
         </a></li>
@@ -439,32 +432,6 @@ require_once('ketnoi.php');
             case "xoa_yeuthich":
               require_once 'xoa_yeuthich.php';
               break;
-            // --- ĐƠN HÀNG ---
-            case "danhsachdonhang":
-              require_once 'donhang.php';
-              break;
-            case "them_donhang":
-              require_once 'them_donhang.php';
-              break;
-            case "sua_donhang":
-              require_once 'sua_donhang.php';
-              break;
-            case "xoa_donhang":
-              require_once 'xoa_donhang.php';
-              break;
-            case "xem_donhang":
-              require_once 'xem_donhang.php';
-              break;
-            case "add_sanpham":
-              require_once 'add_sanpham.php';
-              break;
-            case "xoa_sanpham":
-              require_once 'xoa_sanpham.php';
-              break;
-            case "sua_sanpham":
-              require_once 'sua_sanpham.php';
-              break;
-
 
             // --- MẶC ĐỊNH ---
             default:

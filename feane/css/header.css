@@ -113,6 +113,27 @@
   border-radius: 1px;
 }
 
+.header-left,
+.header-center,
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-center {
+  flex: 1;
+  justify-content: center; /* ✨ search ra giữa */
+}
+
+/* Tách khoảng cách tự nhiên */
+.header-left {
+  gap: 16px;
+}
+
+.header-right {
+  gap: 16px;
+}
+
 /* Ngăn xuống dòng và căn chỉnh user góc phải */
 .user_option {
   flex-shrink: 0;
@@ -175,7 +196,7 @@ body {
 
 /* Khi active */
 .search-box.active .search-input {
-  width: 220px;
+  width: 600px;
   opacity: 1;
   border: 1px solid #ffa726;
 }
@@ -236,11 +257,9 @@ body {
 
 /* 📌 Tăng khoảng cách tổng thể giữa các nhóm */
 .custom_nav-container {
-  gap: 16px; /* ✅ phần mới thêm */
-}
-/* Hiệu ứng blink cho icon con mắt */
-.eye-blink {
-  animation: blinkAnim 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 @keyframes blinkAnim {
@@ -256,4 +275,79 @@ body {
   100% {
     transform: scaleY(1);
   }
+}
+
+/* SIDEBAR */
+/* === SIDEBAR YOUTUBE STYLE === */
+.yt-sidebar {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 260px;
+  height: 100vh;
+  background: #181818;
+  color: #fff;
+  overflow-y: auto;
+  padding-top: 70px;
+  z-index: 9999;
+  transition: 0.3s ease;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.yt-sidebar.active {
+  left: 0;
+}
+
+.yt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  z-index: 9998;
+}
+.yt-overlay.active {
+  display: block;
+}
+
+.yt-section {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.yt-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  font-size: 16px;
+  color: #fff;
+  text-decoration: none;
+  gap: 14px;
+  transition: 0.2s;
+}
+
+.yt-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.yt-sidebar::-webkit-scrollbar {
+  width: 7px;
+}
+.yt-sidebar::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+.sidebar-toggle {
+  font-size: 20px;
+  color: #ffa726;
+  cursor: pointer;
+  padding: 6px 8px;
+  transition: 0.25s;
+}
+
+.sidebar-toggle:hover {
+  color: #ffcc80;
 }
